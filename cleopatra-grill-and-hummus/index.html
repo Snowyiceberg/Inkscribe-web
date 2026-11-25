@@ -1,0 +1,2426 @@
+<!doctype html>
+<!--
+  ============================================================================
+  CLEOPATRA GRILL & HUMMUS - DEMO WEBSITE  (one single file: index.html)
+  ============================================================================
+  Welcome, Sean. This comment is your map of the whole site. The site was
+  built with AI help, but everything in it is plain HTML, CSS and a little
+  JavaScript - no build step, no framework, no database. You can open this
+  file in any editor, change text, and re-upload it to the host as-is.
+
+  HOW THIS FILE IS ORGANISED, TOP TO BOTTOM
+  1. <head> (top of file)
+     - The page title and the meta description / keywords: what Google
+       shows in search results. Worth keeping accurate.
+     - A block of JSON-LD "structured data" that tells Google the
+       restaurant name, address, phone, hours and rating. If the phone
+       number or hours ever change, update them there too.
+     - Links to the Google Fonts (Cinzel Decorative, Marcellus,
+       Alegreya Sans) and to assets/hatch-maps.css (map styling).
+     - One big <style> block: ALL of this site's own CSS lives there.
+       It is commented section by section - colours first, then layout,
+       nav, hero/slideshow, menu, order, reviews, visit page, footer,
+       and finally the mobile (phone) rules at the bottom.
+  2. <body>
+     - A hidden SVG "defs" block: shared gold gradients and a pyramid
+       shape that other drawings on the page borrow. Decoration plumbing;
+       you should never need to touch it.
+     - .topbar: the thin dark-red strip at the very top with the hours,
+       the address and the phone number.
+     - <header class="site">: the sticky header with the logo, the main
+       navigation (Home / Menu / Order Online / Reviews / About Us /
+       Visit Us) and the red call button. On phones the nav collapses
+       behind a "Menu" hamburger button (see the JavaScript notes).
+     - .glyphband: the gold hieroglyph strip under the header. Pure
+       decoration, repeated again just above the footer.
+     - <main>: the six "pages" of the site. This is really ONE html file,
+       so all six pages live here as six <div class="page"> blocks:
+         #page-home     hero + photo slideshow, scrolling reviews,
+                        Most Popular cards, lunch section, intro
+         #page-menu     the full menu, grouped by category
+         #page-order    the six delivery buttons (DoorDash, Caviar,
+                        Uber Eats, Seamless, Grubhub, Postmates)
+         #page-reviews  the guest review cards
+         #page-about    the About Us story and photos
+         #page-visit    address, hours table, photos and the map
+       Only one page shows at a time. The JavaScript at the bottom of
+       the file watches the #home / #menu / ... part of the address
+       (the "hash") and shows the matching page. That is why the nav
+       links look like href="#menu" instead of separate .html files.
+     - <footer>: logo, quick links, address, phone and hours again.
+  3. Scripts (very bottom of the file, just before </body>)
+     - assets/hatch-maps.js and assets/map_helpers.js: the map library
+       that draws the interactive map on the Visit page. Generated
+       library files - do not edit them.
+     - One inline script block: all of this site's own JavaScript. It is
+       commented in plain language, section by section, including what
+       breaks if you remove each part. Short version of its jobs:
+       fill in the reviews, switch pages, run the mobile menu, run
+       the photo slideshow, run the Most Popular scroller, load the
+       map, and work out "open now" on the Visit page.
+
+  THE THINGS YOU WILL EDIT MOST - search for the word EDIT:
+  Comments marked "EDIT:" are placed right next to the spots you are
+  most likely to change yourself:
+     EDIT: MENU ITEMS AND PRICES  - in the Menu page markup
+     EDIT: HOURS                  - top bar, Visit page, footer
+     EDIT: PHONE NUMBER           - appears in many places; the surest
+                                    method is find-and-replace on both
+                                    "(303) 469-1831" (the text people
+                                    read) and "3034691831" inside every
+                                    href="tel:+13034691831" (the number
+                                    the phone actually dials)
+     EDIT: PHOTOS                 - files live in the assets/ folder;
+                                    swap the file or change the src
+     EDIT: REVIEWS                - in the REVIEWS list inside the
+                                    JavaScript at the bottom
+     EDIT: DELIVERY LINKS         - in the Order page markup
+
+  COLOURS IN ONE PLACE
+  Every colour on the site comes from the CSS variables at the top of
+  the <style> block (the variables named red, gold, cream, ink and
+  friends, used through the var() function). Change
+  a value there and it changes everywhere. The site is light-only:
+  there is no dark mode - it always shows the light sandstone look,
+  even when a visitor's phone or computer is set to dark mode.
+
+  HOSTING NOTE (the part you already know well)
+  It is a static site: upload index.html plus the whole assets/ folder,
+  keeping the same folder layout, and it runs. Photos are referenced as
+  assets/photo-name.jpg, so the assets folder must sit next to
+  index.html on the server, exactly as it does here.
+  ============================================================================
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="data:," />
+    <title>Cleopatra Grill &amp; Hummus | Egyptian &amp; Mediterranean Restaurant in Federal Heights, CO</title>
+    <meta name="description" content="Cleopatra Grill & Hummus in Federal Heights, CO — Mediterranean eatery serving grilled meats, homemade appetizers, and variety-filled baklava. Egyptian & Mediterranean favorites for 17 years: gyros, kabobs, shawarma, falafel and hummus. Dine in, takeout & delivery, open daily 11 AM–9 PM. Call (303) 469-1831." />
+    <meta name="keywords" content="Cleopatra Grill and Hummus, Mediterranean restaurant Federal Heights CO, Egyptian food Colorado, gyro, shawarma, kabob, falafel, hummus, baklava, Middle Eastern restaurant Westminster CO" />
+    <meta property="og:type" content="restaurant" />
+    <meta property="og:title" content="Cleopatra Grill &amp; Hummus — Federal Heights, CO" />
+    <meta property="og:description" content="Mediterranean eatery serving grilled meats, homemade appetizers, and variety-filled baklava. Dine in, takeout & delivery in Federal Heights, CO — open daily 11 AM–9 PM." />
+    <meta property="og:image" content="assets/gyro-plate.jpg" />
+    <!-- SEO structured data (JSON-LD): invisible to visitors. Google reads
+         this to show the restaurant's name, address, phone, hours and
+         rating in search results and on Maps.
+         EDIT: PHONE NUMBER / HOURS / ADDRESS - if any of those change,
+         update them here as well as in the visible page text below. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Restaurant",
+      "name": "Cleopatra Grill and Hummus",
+      "servesCuisine": ["Egyptian", "Mediterranean", "Middle Eastern", "Greek"],
+      "priceRange": "$$",
+      "telephone": "+1-303-469-1831",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "10250 Federal Blvd, Unit 300",
+        "addressLocality": "Federal Heights",
+        "addressRegion": "CO",
+        "postalCode": "80260",
+        "addressCountry": "US"
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        "opens": "11:00",
+        "closes": "21:00"
+      },
+      "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.3" },
+      "sameAs": ["https://www.instagram.com/cleopatra.grill.and.hummus"]
+    }
+    </script>
+    <!-- Web fonts (loaded from Google Fonts): Cinzel Decorative for the
+         logo-style lettering, Marcellus for headings, Alegreya Sans for
+         body text. If these links are removed the site still works; it
+         just falls back to plain system fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Marcellus&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/hatch-maps.css" />
+    <!-- ================================================================
+         ALL OF THIS SITE'S OWN STYLES live in the <style> block below.
+         It is organised in commented sections, in roughly the order
+         things appear on the page. The map's own styles live in the
+         separate assets/hatch-maps.css file linked just above.
+         ================================================================ -->
+    <style>
+      /* ================================================================
+         COLOUR PALETTE - the single source of truth for colour.
+         These are CSS variables: define once here, use everywhere else
+         as var(--red), var(--gold) and so on. To retheme the whole site
+         (say, a different red), change the hex value here and every
+         heading, button and border that uses it follows automatically.
+         --gold-shine and --gold-shine-soft are ready-made metallic gold
+         gradients used for shiny gold effects.
+         ================================================================ */
+      :root {
+        color-scheme: light;
+        --cream: #faf2df;
+        --cream-2: #f4e8cb;
+        --paper: #fffaf0;
+        --red: #8c1d18;
+        --red-deep: #67120e;
+        --red-bright: #b3372c;
+        --gold: #c9962c;
+        --gold-bright: #eec95e;
+        --gold-pale: #ffe98a;
+        --gold-deep: #8a5f16;
+        --gold-shine: linear-gradient(115deg, #8a5f16 0%, #b8860b 30%, #d9b64a 52%, #b8860b 74%, #8a5f16 100%);
+        --gold-shine-soft: linear-gradient(115deg, #a67c1f 0%, #c9a227 50%, #a67c1f 100%);
+        --ink: #33231a;
+        --ink-soft: #5d4636;
+        --line: #ddc896;
+        --card: #fffaf0;
+        --shadow: 0 10px 30px rgba(103, 18, 14, .14);
+      }
+      /* Light-only: dark mode was removed at Sean's request - the
+         site always uses the light palette above. */
+      /* BASE STYLES for the whole page: border-box sizing (padding and
+         borders count inside an element's width, which makes layout math
+         predictable), smooth scrolling for in-page anchor jumps, the
+         default body font (Alegreya Sans), text colour and page
+         background, Marcellus serif for all headings, red links, and
+         images that never overflow their container. */
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--cream);
+        color: var(--ink);
+        font-family: "Alegreya Sans", system-ui, sans-serif;
+        font-size: 1.05rem;
+        line-height: 1.55;
+      }
+      h1, h2, h3 { font-family: "Marcellus", serif; font-weight: 400; line-height: 1.15; margin: 0; }
+      a { color: var(--red); }
+      img { max-width: 100%; display: block; }
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2rem; }
+      /* .wrap is the centred content column used by almost every
+         section: at most 1120px wide, centred with auto margins, with a
+         little breathing room on the sides for phone screens. */
+      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 1.1rem; }
+
+      /* ---------- Top info bar ----------
+         The thin dark-red strip at the very top of every page, holding
+         the opening hours, the street address and the phone link.
+         EDIT: HOURS / PHONE NUMBER - the text lives in the HTML near
+         the top of <body> (search for "topbar"); these rules only
+         control how that strip looks. */
+      .topbar {
+        background: var(--red-deep);
+        color: #f8e9c9;
+        font-size: .92rem;
+      }
+      .topbar .wrap {
+        display: flex; flex-wrap: wrap; gap: .35rem 1.4rem;
+        align-items: center; justify-content: center;
+        padding-top: .45rem; padding-bottom: .45rem; text-align: center;
+      }
+      .topbar a { color: var(--gold-pale); font-weight: 700; text-decoration: none; }
+      .topbar a:hover { text-decoration: underline; }
+
+      /* ---------- Header / navigation ----------
+         The sticky header that stays pinned to the top while scrolling:
+         logo on the left, nav links on the right, red call button last.
+         A handful of home-page styles (hero tagline, the red lunch band,
+         the About story placeholder box) also sit in this stretch of the
+         stylesheet - a quirk of how the file grew; they are labelled
+         where they appear. The big mobile-nav rules are at the very
+         bottom of this stylesheet. */
+      header.site {
+        position: sticky; top: 0; z-index: 50;
+        background: var(--cream);
+        border-bottom: 2px solid var(--gold);
+        box-shadow: 0 2px 14px rgba(103,18,14,.10);
+      }
+      .navrow {
+        display: flex; align-items: center; gap: 1rem;
+        padding-top: .55rem; padding-bottom: .55rem;
+      }
+      .brand { text-decoration: none; line-height: 1; flex-shrink: 0; }
+      .brand-logo { height: 3.5rem; width: auto; aspect-ratio: 3 / 1; display: block; border-radius: .45rem; }
+      .foot-logo-chip {
+        display: inline-block; background: #0a0806; border-radius: .6rem;
+        padding: .45rem .7rem; border: 2px solid var(--gold);
+      }
+      .foot-logo { height: 3.4rem; width: auto; aspect-ratio: 3 / 1; display: block; border-radius: .35rem; }
+      /* The tagline sentence under the home-page headline
+         ("Mediterranean eatery serving grilled meats..."). */
+      .hero .tagline {
+        font-family: "Marcellus", serif; font-size: clamp(1.2rem, 2.6vw, 1.45rem);
+        color: var(--red); line-height: 1.35; margin: .4rem 0 .6rem; max-width: 32rem;
+      }
+      .pop-band {
+        height: 11.5rem; background: linear-gradient(160deg, var(--red-bright), var(--red-deep));
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: .55rem; color: var(--gold-pale); font-family: "Marcellus", serif; font-size: 1.05rem;
+        text-align: center; padding: 0 1rem;
+      }
+      /* "Great for Lunch" band on the home page: the full-width red
+         band and its three white cards (sandwich prices, salads and
+         plates, and the order-for-lunch card). */
+      .lunch-band { background: var(--red); border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold); }
+      .lunch-band .sec-head h2 { color: var(--gold-pale); }
+      .lunch-band .sec-head p { color: #f6e7c8; }
+      .lunch-grid { display: grid; gap: 1rem; }
+      @media (min-width: 800px) { .lunch-grid { grid-template-columns: repeat(3, 1fr); } }
+      .lunch-card {
+        background: var(--paper); border-radius: .9rem; padding: 1.25rem 1.3rem;
+        border: 2px solid var(--gold);
+      }
+      .lunch-card h3 { color: var(--red); font-size: 1.3rem; margin-bottom: .55rem; }
+      .lunch-card ul { list-style: none; margin: 0; padding: 0; }
+      .lunch-card li {
+        display: flex; justify-content: space-between; gap: 1rem;
+        padding: .34rem 0; border-bottom: 1px dotted var(--gold);
+      }
+      .lunch-card li:last-child { border-bottom: none; }
+      .lunch-card .pr { font-family: "Marcellus", serif; color: var(--red); white-space: nowrap; }
+      .lunch-card p { margin: 0; color: var(--ink-soft); }
+      /* The About page's dashed "story placeholder" box: gold dashed
+         frame, rounded corners, and a cream background. (Fixed
+         2026-11-25: the .story-placeholder selector line was missing,
+         so browsers ignored these styles and the frame never showed.) */
+      .story-placeholder {
+        border: 2.5px dashed var(--gold); border-radius: 1rem; background: var(--cream-2);
+        padding: 1.6rem 1.5rem; text-align: center; margin-top: 1.6rem;
+      }
+      .story-placeholder h3 { color: var(--red); font-size: 1.35rem; margin-bottom: .5rem; }
+      .story-placeholder p { color: var(--ink-soft); margin: 0 auto; max-width: 36rem; }
+      .brand .word {
+        font-family: "Cinzel Decorative", serif; font-weight: 900;
+        font-size: clamp(1.35rem, 4.5vw, 1.9rem); letter-spacing: .01em;
+        background: linear-gradient(180deg, #fff3b0 0%, #ffe98a 22%, #e9c35a 45%, #b8860b 68%, #f9d976 86%, #8a5f16 100%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+        display: inline-flex; align-items: baseline; gap: .02em;
+      }
+      .brand .word svg { height: .82em; width: 1.03em; flex: none; align-self: center; margin: 0 .01em; }
+      .brand .sub {
+        display: block; margin-top: .18rem;
+        font-family: "Cinzel Decorative", serif; font-weight: 700;
+        font-size: clamp(.62rem, 2.4vw, .8rem); letter-spacing: .34em;
+        color: var(--red-bright); text-transform: uppercase;
+      }
+      nav.main { margin-left: auto; }
+      nav.main ul {
+        list-style: none; margin: 0; padding: 0;
+        display: flex; flex-wrap: wrap; gap: .15rem; justify-content: flex-end; align-items: center;
+      }
+      nav.main li { display: flex; align-items: center; }
+      nav.main a {
+        position: relative; isolation: isolate;
+        display: inline-flex; align-items: center; justify-content: center; min-height: 2.75rem;
+        padding: .55rem .85rem; border-radius: .5rem;
+        color: var(--ink); text-decoration: none; font-weight: 700; font-size: 1rem;
+        transition: color .22s ease, text-shadow .22s ease;
+      }
+      /* In plain terms: the six long background-image rules after this
+         comment draw the little gold symbols that appear BEHIND the nav
+         words on hover (pyramid for Home, scarab for Menu, ankh for
+         Order, Eye of Horus for Reviews, feather for About, sun disc
+         for Visit). Each symbol is a tiny SVG drawing encoded into the
+         CSS itself (the long data:image/svg+xml strings). You should
+         never need to edit those strings; they are decoration only and
+         the nav works fine without them.
+         Original note: Gold symbol that shines directly behind the label on hover / focus / current page:
+         a transparent gold pyramid outline for Home (hover / focus only — it does not
+         stay lit just because Home is the current page), a hieroglyph for each other page,
+         over a soft radial gold glow — no button shape or fill behind the name */
+      nav.main a::before {
+        content: ""; position: absolute; left: 50%; top: 50%; z-index: -1;
+        width: 3.4rem; height: 3rem; pointer-events: none;
+        background-repeat: no-repeat, no-repeat; background-position: center, center;
+        background-size: 100% 100%, contain;
+        opacity: 0; transform: translate(-50%,-50%) scale(.7);
+        transition: opacity .22s ease, transform .22s ease;
+      }
+      nav.main a[data-nav="home"]::before {
+        background-image: radial-gradient(circle, rgba(255,224,130,.62) 0%, rgba(255,215,80,.22) 48%, rgba(255,215,80,0) 72%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 22'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff3b0'/%3E%3Cstop offset='.55' stop-color='%23e9c35a'/%3E%3Cstop offset='1' stop-color='%23b8860b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpolygon points='14,2 26,20 2,20' fill='none' stroke='url(%23g)' stroke-width='2.2' stroke-linejoin='round'/%3E%3Cpath d='M14 2 L18.2 20' fill='none' stroke='url(%23g)' stroke-width='1.2' opacity='.7'/%3E%3C/svg%3E");
+      }
+      nav.main a[data-nav="menu"]::before {
+        background-image: radial-gradient(circle, rgba(255,224,130,.62) 0%, rgba(255,215,80,.22) 48%, rgba(255,215,80,0) 72%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff3b0'/%3E%3Cstop offset='.55' stop-color='%23e9c35a'/%3E%3Cstop offset='1' stop-color='%23b8860b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cellipse cx='12' cy='13.5' rx='4.6' ry='5.8' fill='none' stroke='url(%23g)' stroke-width='1.9'/%3E%3Cpath d='M8.6 9.4 Q12 5.8 15.4 9.4' fill='none' stroke='url(%23g)' stroke-width='1.9' stroke-linecap='round'/%3E%3Cpath d='M12 8.4 V19' stroke='url(%23g)' stroke-width='1.1'/%3E%3Cpath d='M7.6 10.5 L3.4 8 M7.2 13.8 L2.8 13.8 M7.6 17 L3.6 19.6 M16.4 10.5 L20.6 8 M16.8 13.8 L21.2 13.8 M16.4 17 L20.4 19.6' fill='none' stroke='url(%23g)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      }
+      nav.main a[data-nav="order"]::before {
+        background-image: radial-gradient(circle, rgba(255,224,130,.62) 0%, rgba(255,215,80,.22) 48%, rgba(255,215,80,0) 72%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff3b0'/%3E%3Cstop offset='.55' stop-color='%23e9c35a'/%3E%3Cstop offset='1' stop-color='%23b8860b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cellipse cx='12' cy='6.4' rx='3.5' ry='4.4' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cpath d='M12 10.8 V21.5 M5.8 14.2 H18.2' fill='none' stroke='url(%23g)' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+      }
+      nav.main a[data-nav="reviews"]::before {
+        background-image: radial-gradient(circle, rgba(255,224,130,.62) 0%, rgba(255,215,80,.22) 48%, rgba(255,215,80,0) 72%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff3b0'/%3E%3Cstop offset='.55' stop-color='%23e9c35a'/%3E%3Cstop offset='1' stop-color='%23b8860b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M2.5 8.5 Q12 2.8 21.5 8.5' fill='none' stroke='url(%23g)' stroke-width='1.9' stroke-linecap='round'/%3E%3Cpath d='M4 13 Q12 7.6 20 13 Q12 17.8 4 13 Z' fill='none' stroke='url(%23g)' stroke-width='1.7' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='12.6' r='2.5' fill='url(%23g)'/%3E%3Cpath d='M8 17.4 V21 M16.8 16.6 Q20 17.2 19.2 20.2' fill='none' stroke='url(%23g)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      }
+      nav.main a[data-nav="about"]::before {
+        background-image: radial-gradient(circle, rgba(255,224,130,.62) 0%, rgba(255,215,80,.22) 48%, rgba(255,215,80,0) 72%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff3b0'/%3E%3Cstop offset='.55' stop-color='%23e9c35a'/%3E%3Cstop offset='1' stop-color='%23b8860b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 21.5 C6.4 16.5 5.8 8.5 12 2.8 C18.2 8.5 17.6 16.5 12 21.5 Z' fill='rgba(233,195,90,.22)' stroke='url(%23g)' stroke-width='1.8' stroke-linejoin='round'/%3E%3Cpath d='M12 20.5 V5' stroke='url(%23g)' stroke-width='1.2' stroke-linecap='round'/%3E%3Cpath d='M12 9 L8.6 6.8 M12 13 L8.2 10.8 M12 9 L15.4 6.8 M12 13 L15.8 10.8' fill='none' stroke='url(%23g)' stroke-width='1' stroke-linecap='round' opacity='.85'/%3E%3C/svg%3E");
+      }
+      nav.main a[data-nav="visit"]::before {
+        background-image: radial-gradient(circle, rgba(255,224,130,.62) 0%, rgba(255,215,80,.22) 48%, rgba(255,215,80,0) 72%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff3b0'/%3E%3Cstop offset='.55' stop-color='%23e9c35a'/%3E%3Cstop offset='1' stop-color='%23b8860b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='12' cy='12' r='6.8' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='2' fill='url(%23g)'/%3E%3C/svg%3E");
+      }
+      nav.main a:hover, nav.main a:focus-visible {
+        background: transparent; color: var(--red-deep); box-shadow: none;
+        text-shadow: 0 0 12px rgba(255,215,80,.45);
+      }
+      nav.main a:hover::before, nav.main a:focus-visible::before,
+      nav.main a[aria-current="page"]:not([data-nav="home"])::before {
+        opacity: 1; transform: translate(-50%,-50%) scale(1);
+      }
+      /* Pyramid for Home shows only on hover (or keyboard focus), never as a
+         persistent current-page marker */
+      nav.main a[data-nav="home"][aria-current="page"]:not(:hover):not(:focus-visible)::before {
+        opacity: 0; transform: translate(-50%,-50%) scale(.7);
+      }
+      nav.main a[aria-current="page"] {
+        background: transparent; color: var(--red-deep); box-shadow: none;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        nav.main a, nav.main a::before { transition: none; }
+      }
+      /* The red "call" button in the nav (and its hover state just
+         below): red fill, gold border, cream text, phone number centred
+         inside it. The matching mobile version is at the bottom of
+         this stylesheet. */
+      .callbtn {
+        display: inline-flex; align-items: center; justify-content: center; text-align: center;
+        line-height: 1.15; gap: .45rem; min-height: 2.75rem;
+        background: var(--red); color: #fdf3da !important; border: 2px solid var(--gold-bright); border-radius: .5rem;
+        padding: .55rem .95rem;
+        font-weight: 700; text-decoration: none; white-space: nowrap;
+        box-shadow: 0 2px 10px rgba(103,18,14,.22), inset 0 0 0 1px rgba(255,233,138,.35);
+      }
+      nav.main a.callbtn:hover, nav.main a.callbtn:focus-visible {
+        background: var(--red-bright); color: #fdf3da !important;
+        box-shadow: 0 2px 10px rgba(103,18,14,.22), inset 0 0 0 1px rgba(255,233,138,.35);
+      }
+
+      /* Hamburger button ("Menu" with three bars): hidden on desktop.
+         The media query at the bottom of this stylesheet shows it on
+         screens 760px and narrower and turns its three bars into an X
+         while the menu is open. The JavaScript at the bottom of the
+         file is what actually opens and closes the menu. */
+      .navtoggle { display: none; }
+
+      /* ---------- Hieroglyph band ----------
+         The gold-on-red hieroglyph strip under the header (and repeated
+         above the footer). It is one 400px-wide SVG chunk repeated side
+         by side until it fills the width. Pure decoration: the .g rules
+         are the gold outlines, the .gf rules are the small filled dots.
+         Deleting the band's HTML would not affect anything else. */
+      .glyphband {
+        background: var(--red);
+        border-top: 1px solid var(--gold);
+        border-bottom: 1px solid var(--gold);
+        overflow: hidden; line-height: 0;
+      }
+      .glyphband { display: flex; }
+      .glyphband svg { flex: 0 0 auto; width: 400px; height: 44px; display: block; }
+      .glyphband .g { fill: none; stroke: #e9c35a; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .85; }
+      .glyphband .gf { fill: #e9c35a; stroke: none; opacity: .85; }
+
+      /* ---------- Gold frame band (currently NOT used on the page) ----
+         Styles for an alternate decoration Sean tried under the navbar:
+         heavy double gold rules with diamond studs, inspired by the gold
+         frame by the restaurant door. The site currently shows the
+         hieroglyph band instead, so no element on the page uses these
+         .frameband classes right now. They are kept in case he wants to
+         swap back; deleting this block changes nothing visible unless
+         a .frameband element is added to the HTML. */
+      .frameband {
+        background: var(--cream);
+        overflow: hidden; line-height: 0; display: flex;
+        padding: .3rem 0 .35rem;
+      }
+      .frameband svg { flex: 0 0 auto; width: 320px; height: 22px; display: block; }
+      .frameband .fb-main { fill: none; stroke: url(#fbsoft); stroke-width: 3.4; stroke-linecap: round; }
+      .frameband .fb-fine { fill: none; stroke: url(#fbsoft); stroke-width: 1.6; opacity: .85; }
+      .frameband .fb-stud { fill: url(#fbshine); stroke: #7c5514; stroke-width: .8; stroke-linejoin: round; }
+
+      /* ---------- Page views (how the six "pages" work) ----------
+         Every page starts hidden (.page). The JavaScript adds the
+         .active class to exactly one page at a time, and only that one
+         displays, with a short fade-in. If you add a new page section,
+         it needs class="page", an id like id="page-name", and its name
+         added to the PAGES list in the JavaScript, or it will never
+         show. */
+      .page { display: none; }
+      .page.active { display: block; animation: fadein .3s ease; }
+      @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) {
+        .page.active { animation: none; }
+        html { scroll-behavior: auto; }
+      }
+
+      /* ---------- Hero (top of the Home page) ----------
+         Layout Sean settled on: headline, tagline and buttons in a
+         column on the LEFT, photo slideshow on the RIGHT on wide
+         screens; stacked in one column on phones. Also in this section:
+         the small pill .badge labels, the .cta-row button row, and the
+         three button styles (.btn-red solid red, .btn-gold outlined
+         gold, .btn-outline outlined red) used across the whole site. */
+      .hero { background: var(--cream); }
+      .hero-grid {
+        display: grid; grid-template-columns: 1fr; gap: 1.8rem; align-items: center;
+        max-width: 1120px; margin: 0 auto; padding: 2.4rem 1.1rem 2.8rem;
+      }
+      @media (min-width: 860px) { .hero-grid { grid-template-columns: 1fr 1.08fr; gap: 2.4rem; } }
+      .hero-grid > figure { margin: 0; }
+      .hero-text { text-align: left; }
+      .hero h1 { font-size: clamp(1.9rem, 5.2vw, 3rem); color: var(--red-deep); }
+      .hero h1 .gold { color: var(--gold-deep); }
+      .hero p.lede { font-size: 1.15rem; color: var(--ink-soft); max-width: 34rem; }
+      @media (max-width: 760px) {
+        .hero-grid { padding: 1.6rem 1.1rem 2rem; }
+        .hero h1 { font-size: clamp(1.65rem, 7.2vw, 2.15rem); }
+        .hero p.lede { font-size: 1.02rem; }
+      }
+      .badges { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0 1.2rem; }
+      .badge {
+        border: 1.5px solid var(--gold); color: var(--red); background: var(--paper);
+        border-radius: 999px; padding: .32rem .85rem; font-weight: 700; font-size: .93rem;
+      }
+      .cta-row { display: flex; flex-wrap: wrap; gap: .6rem; }
+      /* Base shape shared by every button on the site (minimum height,
+         padding, rounded corners, bold text). The colour variants
+         .btn-red / .btn-gold / .btn-outline follow right after. */
+      .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+        min-height: 3rem; padding: .6rem 1.3rem; border-radius: .55rem;
+        font-weight: 700; font-size: 1.02rem; text-decoration: none; border: 2px solid transparent;
+      }
+      .btn-red { background: var(--red); color: #fdf3da; border-color: var(--red-deep); }
+      .btn-red:hover { background: var(--red-bright); color: #fdf3da; }
+      .btn-gold {
+        background: transparent; color: var(--red-deep); border-color: var(--gold);
+        transition: background .25s ease;
+      }
+      .btn-gold:hover { background: var(--cream-2); color: var(--red-deep); }
+      .btn-outline { background: transparent; color: var(--red); border-color: var(--red); }
+      .btn-outline:hover { background: var(--cream-2); color: var(--red-deep); }
+      @media (prefers-reduced-motion: reduce) { .btn-gold { transition: none; } }
+
+      /* ---------- Photo slideshow (Home page hero) ----------
+         The framed photo box on the home page. All slides are stacked
+         on top of each other; only the one with the .on class is visible
+         (the rest are transparent), and they cross-fade. The JavaScript
+         moves the .on class from slide to slide every 4.5 seconds and
+         when the arrows or dots are clicked. Captions sit on a dark
+         gradient at the bottom of each photo. */
+      .slideshow {
+        position: relative; border-radius: 1rem; overflow: hidden;
+        border: 2px solid var(--gold);
+        box-shadow: var(--shadow);
+        width: 100%; aspect-ratio: 4 / 3; background: #241611;
+      }
+      .slide {
+        position: absolute; inset: 0; opacity: 0; transition: opacity .7s ease;
+        pointer-events: none;
+      }
+      .slide.on { opacity: 1; pointer-events: auto; }
+      .slide img { width: 100%; height: 100%; object-fit: cover; }
+      .slide figcaption {
+        position: absolute; left: 0; right: 0; bottom: 0;
+        padding: 2.2rem 1.1rem .95rem; color: #fdf3da; font-weight: 700; font-size: 1.05rem;
+        background: linear-gradient(180deg, transparent, rgba(30,10,5,.82));
+      }
+      .slide figcaption span { display: block; font-weight: 400; font-size: .92rem; opacity: .92; }
+      .slidenav {
+        position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+        width: 2.9rem; height: 2.9rem; border-radius: 50%; border: 2px solid var(--gold-bright);
+        background: var(--red); color: #fdf3da; font-size: 1.35rem; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 3px 10px rgba(0,0,0,.3), inset 0 0 0 1px rgba(255,233,138,.35);
+      }
+      .slidenav:hover { background: var(--red-bright); }
+      .slidenav.prev { left: .6rem; } .slidenav.next { right: .6rem; }
+      /* The small round dot buttons overlaid on the slideshow (one per
+         photo, created by the JavaScript). The filled gold dot marks
+         the photo currently showing. */
+      .dots { position: absolute; right: .9rem; top: .8rem; z-index: 3; display: flex; gap: .4rem; }
+      @media (min-width: 860px) {
+        .dots { top: auto; bottom: .8rem; }
+        .slide figcaption { padding-right: 12rem; }
+      }
+      .dots button, .dots button:hover {
+        width: 2rem; height: 2rem; min-height: 2rem; border-radius: 50%; border: none; cursor: pointer;
+        background: transparent; display: flex; align-items: center; justify-content: center; padding: 0;
+      }
+      .dots button::after {
+        content: ""; width: .62rem; height: .62rem; border-radius: 50%;
+        background: rgba(253,243,218,.55); border: 1.5px solid var(--gold-pale);
+      }
+      .dots button[aria-current="true"]::after { background-color: #e9c35a; }
+      @media (prefers-reduced-motion: reduce) { .slide { transition: none; } }
+
+      /* ---------- Reviews marquee (scrolling strip, Home page) -----
+         The dark-red band under the hero where review cards scroll
+         sideways forever. The cards themselves are built by the
+         JavaScript from the REVIEWS list; these rules only style them.
+         The track is duplicated once in code so the loop can wrap
+         seamlessly, the scroll pauses when hovered, and visitors who
+         prefer reduced motion get a plain scrollable strip instead. */
+      .marquee-zone { background: var(--red-deep); padding: 1rem 0 1.15rem; overflow: hidden; }
+      .marquee-zone h2 {
+        color: var(--gold-pale); text-align: center; font-size: 1.15rem;
+        letter-spacing: .14em; text-transform: uppercase; margin-bottom: .7rem;
+      }
+      .marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+      /* The moving row of review cards. Its animation (scrollx, defined
+         just below) slides it left by half its width over 55 seconds,
+         then loops. Lower the 55s in the .marquee-track rule's
+         animation (a few lines down in the original block) for a
+         faster strip, raise it for a slower one. */
+      .marquee-track {
+        display: flex; gap: 1rem; width: max-content;
+        animation: scrollx 55s linear infinite;
+      }
+      .marquee:hover .marquee-track, .marquee:focus-within .marquee-track { animation-play-state: paused; }
+      @keyframes scrollx { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+      @media (prefers-reduced-motion: reduce) {
+        .marquee { overflow-x: auto; }
+        .marquee-track { animation: none; }
+      }
+      .rev-chip {
+        flex: 0 0 auto; width: min(21rem, 82vw);
+        background: #fdf6e3; color: #33231a; border: 2px solid var(--gold);
+        border-radius: .8rem; padding: .85rem 1rem;
+      }
+      .rev-chip .stars, .rev-card .stars { color: var(--gold); letter-spacing: .18em; }
+      .rev-chip .stars { letter-spacing: .18em; font-size: .95rem; }
+      .rev-chip p { margin: .35rem 0 .45rem; font-size: 1rem; }
+      .rev-chip cite { font-style: normal; font-weight: 700; color: var(--red); font-size: .92rem; }
+
+      /* ---------- General section layout ----------
+         Shared building blocks used by every page: vertical spacing for
+         <section class="block">, the centred section headings (.sec-head
+         with its title and intro paragraph), the thin .divider rule,
+         the two-column .about-grid used on Home and About, and the
+         .stat boxes (the "17 years" style counters). */
+      section.block { padding: 1.6rem 0 2.6rem; }
+      .sec-head { text-align: center; margin-bottom: 1.4rem; }
+      .sec-head h2 { font-size: clamp(1.65rem, 4vw, 2.3rem); color: var(--red-deep); }
+      .sec-head p { color: var(--ink-soft); max-width: 42rem; margin: .5rem auto 0; }
+      .divider { border: none; border-top: 2px solid var(--line); margin: 0; }
+
+      .about-grid { display: grid; gap: 1.6rem; align-items: start; }
+      @media (min-width: 860px) { .about-grid { grid-template-columns: 1.05fr 1fr; } }
+      /* ---------- Decorative Egyptian photo frames + the map frame --
+         .photo-frame wraps photos (storefront, dining room) in a thick
+         metallic-gold border with clipped corners, like the frames in
+         the restaurant. .map-frame gives the Visit page map the same
+         treatment. Inside it, #visitMap is the box the interactive map
+         draws into (340px tall), and .map-fallback is the static map
+         picture that stays hidden unless the live map fails to load -
+         the JavaScript swaps between the two. The .pin rules style the
+         map's location pin. */
+      .photo-frame {
+        padding: 6px;
+        background: linear-gradient(140deg, #7d5c17 0%, #a37f24 30%, #c39a35 52%, #96700f 78%, #7d5c17 100%);
+        clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
+      }
+      .photo-frame img {
+        border: 2px solid var(--red-deep); border-radius: 0; box-shadow: none; width: 100%;
+      }
+      /* Gold frame around the map on the Visit page (see the section
+         comment above for how the live map and fallback picture swap). */
+      .map-frame {
+        margin-top: 1.6rem; padding: 6px;
+        background: linear-gradient(140deg, #7d5c17 0%, #a37f24 30%, #c39a35 52%, #96700f 78%, #7d5c17 100%);
+        clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
+      }
+      .map-frame .map-box { position: relative; border: 2px solid var(--red-deep); background: var(--cream-2); }
+      #visitMap { width: 100%; height: 340px; }
+      .map-fallback { display: none; }
+      .map-fallback img { display: block; width: 100%; height: 340px; object-fit: cover; }
+      .map-credit { text-align: center; margin: .55rem 0 0; font-size: .82rem; }
+      .map-credit a { color: var(--ink-soft); }
+      .pin {
+        width: 1.9rem; height: 1.9rem; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+        background: var(--red); border: 2px solid var(--gold-bright); color: #fdf3da;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: .95rem; box-shadow: 0 3px 8px rgba(0,0,0,.35); cursor: pointer;
+      }
+      .pin > * { transform: rotate(45deg); }
+      .pin--on { background: var(--red-bright); }
+
+      .about-grid figure { margin: 0; }
+      .about-grid figcaption { font-size: .9rem; color: var(--ink-soft); margin-top: .5rem; text-align: center; }
+      .stat-row { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 1.1rem; }
+      .stat {
+        flex: 1 1 8.5rem; background: var(--card); border: 1.5px solid var(--line);
+        border-top: 4px solid var(--gold); border-radius: .7rem; padding: .8rem .9rem; text-align: center;
+      }
+      .stat b { display: block; font-family: "Marcellus", serif; font-size: 1.5rem; color: var(--red); }
+      .stat span { font-size: .9rem; color: var(--ink-soft); }
+
+      /* ---------- Most Popular cards (Home page scroller) ----------
+         The row of five favourite-dish cards on the home page. The row
+         scrolls sideways with snap points; the round arrow buttons
+         (.pop-arrow) are wired up in the JavaScript, which also greys
+         an arrow out when you reach either end. Card photos get a
+         double gold border with a thin red line under it. Prices inside
+         the cards are plain HTML - see the EDIT note in the markup. */
+      .pop-scroller-shell { position: relative; }
+      .pop-controls {
+        display: flex; align-items: center; justify-content: center; gap: .6rem;
+        margin: -.35rem 0 .9rem;
+      }
+      .pop-controls .hint { font-size: .92rem; color: var(--ink-soft); font-style: italic; margin-right: .15rem; }
+      .pop-arrow {
+        width: 2.6rem; height: 2.6rem; min-height: 2.6rem; border-radius: 50%;
+        border: 2px solid var(--gold-bright); background: var(--red); color: #fdf3da;
+        font-size: 1.25rem; line-height: 1; cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center;
+        box-shadow: 0 3px 10px rgba(103,18,14,.18);
+      }
+      .pop-arrow:hover { background: var(--red-bright); }
+      .pop-arrow:disabled { opacity: .38; cursor: default; box-shadow: none; }
+      .pop-arrow:focus-visible, .pop-grid:focus-visible { outline: 3px solid var(--gold-bright); outline-offset: 3px; }
+      .pop-grid {
+        display: flex; gap: 1.1rem;
+        overflow-x: auto; overflow-y: hidden;
+        scroll-snap-type: x mandatory; scroll-behavior: smooth;
+        padding: .3rem .3rem 1rem; margin: 0 -.3rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin; scrollbar-color: var(--gold) var(--cream-2);
+      }
+      .pop-grid::-webkit-scrollbar { height: 8px; }
+      .pop-grid::-webkit-scrollbar-track { background: var(--cream-2); border-radius: 999px; }
+      .pop-grid::-webkit-scrollbar-thumb { background-color: #c9962c; border-radius: 999px; }
+      .pop-grid::-webkit-scrollbar-thumb:hover { background-color: #b8860b; }
+      @media (prefers-reduced-motion: reduce) { .pop-grid { scroll-behavior: auto; } }
+      .pop-card {
+        flex: 0 0 min(16.75rem, 76vw);
+        scroll-snap-align: start;
+        background: var(--card); border: 1.5px solid var(--line); border-radius: .9rem;
+        overflow: hidden; box-shadow: 0 4px 16px rgba(103,18,14,.08);
+        display: flex; flex-direction: column;
+      }
+      @media (min-width: 860px) { .pop-card { flex-basis: 15.9rem; } }
+      .pop-card img { width: 100%; height: 11.5rem; object-fit: cover; border-bottom: 6px double var(--gold); box-shadow: 0 2px 0 var(--red); }
+      .pop-card .body { padding: .95rem 1.05rem 1.1rem; display: flex; flex-direction: column; gap: .35rem; flex: 1; }
+      .pop-card h3 { font-size: 1.22rem; color: var(--red-deep); }
+      .pop-card p { margin: 0; color: var(--ink-soft); font-size: .97rem; flex: 1; }
+      .pop-card .row { display: flex; align-items: center; justify-content: space-between; margin-top: .55rem; }
+      .price { font-family: "Marcellus", serif; font-size: 1.3rem; color: var(--red); font-weight: 700; }
+      .tag {
+        background: var(--red); color: #fdf3da; font-size: .78rem; font-weight: 700;
+        letter-spacing: .06em; text-transform: uppercase; border-radius: 999px; padding: .22rem .6rem;
+      }
+
+      /* ---------- Menu page ----------
+         .catnav is the sticky row of category pills (Appetizers,
+         Sandwiches, ...) that stays under the header while the menu
+         scrolls; the JavaScript smooth-scrolls to the chosen category.
+         Each category is a .menu-cat block with a red title banner.
+         Individual dishes are list items styled by .menu-list below. */
+      /* The category pill bar described above. "top: 4.6rem" is where
+         it sticks - just under the main header. On phones the mobile
+         rules at the bottom set top: 0 instead. */
+      .catnav {
+        display: flex; flex-wrap: wrap; gap: .45rem; justify-content: center; margin-bottom: 1.8rem;
+        position: sticky; top: 4.6rem; z-index: 20; background: var(--cream);
+        padding: .6rem 0; border-bottom: 1.5px solid var(--line);
+      }
+      .catnav a {
+        display: inline-flex; align-items: center; min-height: 2.5rem; padding: .35rem .85rem;
+        border: 1.5px solid var(--gold-bright); border-radius: 999px; text-decoration: none;
+        color: var(--red); font-weight: 700; font-size: .94rem; background: var(--paper);
+        box-shadow: inset 0 0 0 1px rgba(255,233,138,.35);
+      }
+      .catnav a:hover {
+        background: var(--cream-2); color: var(--red-deep);
+        box-shadow: inset 0 0 0 1px var(--gold);
+      }
+      .menu-cat { margin-bottom: 2.4rem; scroll-margin-top: 9rem; }
+      .menu-cat > h3 {
+        font-size: 1.4rem; text-align: center; margin: 0 auto 1rem;
+        background: var(--red); color: #fdf3da; width: fit-content; max-width: 100%;
+        padding: .38em 1.4em; border: 2px solid var(--gold); border-radius: .4rem;
+        box-shadow: 0 3px 10px rgba(103,18,14,.18); letter-spacing: .02em;
+      }
+      .menu-cat > .note { text-align: center; color: var(--ink-soft); font-style: italic; margin: 0 auto 1.1rem; max-width: 40rem; }
+      .menu-feature { margin: 0 auto 1.3rem; max-width: 26rem; text-align: center; }
+      .menu-feature img {
+        width: 100%; aspect-ratio: 4 / 3; object-fit: cover;
+        border: 3px solid var(--gold); border-radius: .8rem; box-shadow: var(--shadow);
+      }
+      .menu-feature figcaption { font-size: .95rem; color: var(--ink-soft); margin-top: .5rem; }
+      .menu-feature figcaption b { color: var(--red); font-family: "Marcellus", serif; font-size: 1.05rem; }
+      /* One menu item = one <li> with three parts: .name (the dish),
+         .pr (the price, right-aligned, Marcellus font) and .desc (the
+         small description underneath). Two columns on wide screens,
+         one column on phones. To change a price you only edit the
+         number inside <span class="pr"> in the HTML - see the EDIT
+         note at the top of the Menu page markup. */
+      .menu-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0 2.6rem; }
+      @media (min-width: 800px) { .menu-list { grid-template-columns: 1fr 1fr; } }
+      .menu-list li {
+        padding: .68rem 0; border-bottom: 1px dotted var(--gold);
+        display: grid; grid-template-columns: 1fr auto; gap: .2rem 1rem;
+      }
+      .menu-list .name { font-weight: 700; font-size: 1.06rem; }
+      .menu-list .name .tag { margin-left: .5rem; vertical-align: middle; }
+      .menu-list .desc { grid-column: 1; color: var(--ink-soft); font-size: .95rem; }
+      .menu-list .pr { font-family: "Marcellus", serif; font-size: 1.12rem; color: var(--red); white-space: nowrap; }
+
+      /* ---------- Order page ----------
+         .serve-row is the row of three red boxes (Dine-In / Takeout /
+         Delivery). .order-grid is the grid of six delivery cards, one
+         per platform, each with a heading, a line of text and a red
+         order button pinned to the bottom. The button web addresses
+         themselves live in the HTML - see the EDIT: DELIVERY LINKS
+         note in the Order page markup. */
+      .order-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
+      .order-card {
+        background: var(--card); border: 1.5px solid var(--line); border-radius: .9rem;
+        padding: 1.3rem 1.2rem; text-align: center; box-shadow: 0 4px 16px rgba(103,18,14,.08);
+        display: flex; flex-direction: column;
+      }
+      .order-card h3 { font-size: 1.45rem; margin-bottom: .35rem; color: var(--red-deep); }
+      .order-card p { color: var(--ink-soft); margin: 0 0 1rem; font-size: .97rem; }
+      .order-card .btn { width: 100%; margin-top: auto; }
+      .order-note { text-align: center; color: var(--ink-soft); margin-top: 1.4rem; }
+      .serve-row { display: grid; gap: 1rem; margin-bottom: 2.2rem; }
+      @media (min-width: 760px) { .serve-row { grid-template-columns: repeat(3, 1fr); } }
+      .serve {
+        background: var(--red); color: #fdf3da; border-radius: .9rem; padding: 1.2rem 1.1rem; text-align: center;
+        border: 2px solid var(--gold);
+      }
+      .serve h3 { font-size: 1.3rem; color: var(--gold-pale); margin-bottom: .3rem; }
+      .serve p { margin: 0; font-size: .97rem; opacity: .95; }
+
+      /* ---------- Reviews page ----------
+         The grid of review cards (.rev-card) on the Reviews page: white
+         card, gold top border, gold stars, quote, then the reviewer's
+         name in red. The cards are filled in by the JavaScript from
+         the REVIEWS list, so there is no review text to edit here -
+         see EDIT: REVIEWS at the bottom of the file. */
+      .rev-grid { display: grid; gap: 1.1rem; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); }
+      .rev-card {
+        background: var(--card); border: 1.5px solid var(--line); border-top: 4px solid var(--gold);
+        border-radius: .8rem; padding: 1.15rem 1.2rem;
+      }
+      .rev-card .stars { letter-spacing: .2em; }
+      .rev-card p { margin: .5rem 0 .7rem; font-size: 1.05rem; }
+      .rev-card cite { font-style: normal; font-weight: 700; color: var(--red); }
+
+      /* ---------- Visit page ----------
+         Two-column layout: info cards on the left, photo on the right.
+         .info-card is the white card used for "Find Us" and "Hours".
+         .hours is the hours table; the JavaScript adds a .today class
+         to the current day's row, which is what turns that row red.
+         .big-link is the large tappable phone number. */
+      .visit-grid { display: grid; gap: 1.6rem; }
+      @media (min-width: 860px) { .visit-grid { grid-template-columns: 1fr 1fr; } }
+      .info-card {
+        background: var(--card); border: 1.5px solid var(--line); border-radius: .9rem;
+        padding: 1.4rem 1.4rem 1.5rem; box-shadow: 0 4px 16px rgba(103,18,14,.08);
+      }
+      .info-card h3 { font-size: 1.35rem; color: var(--red); margin-bottom: .7rem; }
+      /* Hours table styling: dotted gold row dividers, times aligned
+         right and bold, and the .today highlight described above.
+         EDIT: HOURS - the day/time text itself is in the Visit page
+         HTML (and the open/closed maths is in the JavaScript). */
+      .hours { width: 100%; border-collapse: collapse; }
+      .hours td { padding: .42rem 0; border-bottom: 1px dotted var(--gold); }
+      .hours td:last-child { text-align: right; font-weight: 700; }
+      .hours tr.today td { color: var(--red); font-weight: 700; }
+      .big-link { font-size: 1.25rem; font-weight: 700; }
+      .visit-grid figure { margin: 0; }
+      .visit-grid figcaption { font-size: .9rem; color: var(--ink-soft); margin-top: .5rem; text-align: center; }
+
+      /* ---------- Footer ----------
+         The deep-red footer on every page: logo and blurb, quick links,
+         and the address / phone / hours column, over a thin gold rule
+         with the fine print at the bottom. The logo sits on a black
+         chip (.foot-logo-chip) because the logo image itself has a
+         black background. EDIT: the footer repeats the phone number,
+         address and hours - update them here too when they change. */
+      footer {
+        background: var(--red-deep); color: #f3e3c2; margin-top: 1rem;
+      }
+      footer .wrap { padding-top: 2rem; padding-bottom: 1.6rem; }
+      .foot-grid { display: grid; gap: 1.4rem; }
+      @media (min-width: 800px) { .foot-grid { grid-template-columns: 1.3fr 1fr 1fr; } }
+      footer h3 { color: var(--gold-pale); font-size: 1.1rem; margin-bottom: .55rem; }
+      footer a { color: var(--gold-pale); }
+      footer p { margin: .25rem 0; font-size: .97rem; }
+      footer ul { list-style: none; margin: 0; padding: 0; }
+      footer li a { display: inline-flex; align-items: center; min-height: 2.2rem; text-decoration: none; }
+      footer li a:hover { text-decoration: underline; }
+      .foot-brand .word {
+        font-family: "Cinzel Decorative", serif; font-weight: 900; font-size: 1.55rem;
+        background: linear-gradient(180deg, #fff3b0 0%, #ffe98a 22%, #e9c35a 45%, #b8860b 68%, #f9d976 86%, #8a5f16 100%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+        display: inline-flex; align-items: baseline;
+      }
+      .foot-brand .word svg { height: .82em; width: 1.03em; flex: none; align-self: center; margin: 0 .01em; }
+      .foot-brand .sub {
+        display: block; font-family: "Cinzel Decorative", serif; font-weight: 700;
+        font-size: .68rem; letter-spacing: .34em; color: #e07856; text-transform: uppercase; margin-top: .15rem;
+      }
+      .fineprint {
+        border-top: 1px solid rgba(236,210,142,.35); margin-top: 1.6rem; padding-top: 1rem;
+        font-size: .88rem; color: #d9c096; display: flex; flex-wrap: wrap; gap: .4rem 1.6rem; justify-content: space-between;
+      }
+
+      /* ---------- Mobile header: hamburger menu (phones) ----------
+         Everything in this media query applies only on screens 760px
+         wide or narrower. It shrinks the logo, shows the red "Menu"
+         hamburger button, and turns the nav into a vertical drop-down
+         list that is hidden until the header gets the .nav-open class.
+         That class is added and removed by the JavaScript when the
+         button is tapped - CSS alone cannot open the menu. */
+      @media (max-width: 760px) {
+        .navrow { flex-wrap: wrap; gap: .35rem .8rem; }
+        .brand-logo { height: 2.9rem; }
+        .navtoggle {
+          display: inline-flex; align-items: center; gap: .55rem; margin-left: auto;
+          min-height: 2.9rem; padding: .5rem .95rem; cursor: pointer;
+          background: var(--red); color: #fdf3da; border: 2px solid var(--gold-bright);
+          border-radius: .55rem; font-family: inherit; font-weight: 700; font-size: 1rem;
+          -webkit-tap-highlight-color: transparent;
+          box-shadow: 0 2px 10px rgba(103,18,14,.22), inset 0 0 0 1px rgba(255,233,138,.35);
+        }
+        .navtoggle:hover { background: var(--red-bright); }
+        .navtoggle:focus-visible { outline: 3px solid var(--gold-bright); outline-offset: 2px; }
+        .navtoggle-bars { display: inline-flex; flex-direction: column; gap: 4px; }
+        .navtoggle-bars span {
+          display: block; width: 1.3rem; height: 2.5px; border-radius: 2px;
+          background: currentColor; transition: transform .2s ease, opacity .2s ease;
+        }
+        header.site.nav-open .navtoggle-bars span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+        header.site.nav-open .navtoggle-bars span:nth-child(2) { opacity: 0; }
+        header.site.nav-open .navtoggle-bars span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+        nav.main { order: 3; width: 100%; margin-left: 0; display: none; }
+        header.site.nav-open nav.main { display: block; animation: fadein .25s ease; }
+        nav.main ul { flex-direction: column; flex-wrap: nowrap; gap: 0; justify-content: flex-start; padding: .3rem 0 .5rem; }
+        nav.main li { border-top: 1px solid var(--line); }
+        nav.main li:first-child { border-top: none; }
+        nav.main li:last-child { border-top: none; }
+        nav.main a { display: flex; width: 100%; min-height: 3rem; padding: .6rem .8rem; font-size: 1.05rem; border-radius: .4rem; justify-content: flex-start; }
+        nav.main a.callbtn { justify-content: center; margin-top: .55rem; }
+        .catnav { top: 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .navtoggle-bars span { transition: none; }
+        header.site.nav-open nav.main { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Shared SVG definitions (invisible plumbing, safe to ignore):
+         gold colour gradients (goldgrad for the pyramid, fbshine /
+         fbsoft for the gold frame band) and a reusable pyramid shape.
+         Other drawings on the page reference these by id instead of
+         repeating the gradient numbers everywhere. -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <linearGradient id="goldgrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fff3b0" />
+          <stop offset=".28" stop-color="#ffe98a" />
+          <stop offset=".52" stop-color="#d4af37" />
+          <stop offset=".76" stop-color="#f9d976" />
+          <stop offset="1" stop-color="#8a5f16" />
+        </linearGradient>
+        <linearGradient id="fbshine" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#8a5f16" />
+          <stop offset=".22" stop-color="#d4af37" />
+          <stop offset=".42" stop-color="#fff3b0" />
+          <stop offset=".58" stop-color="#f9d976" />
+          <stop offset=".78" stop-color="#b8860b" />
+          <stop offset="1" stop-color="#8a5f16" />
+        </linearGradient>
+        <!-- Toned-down gold for the frameband rules between the diamond studs:
+             still metallic, but without the near-white hot spots of fbshine -->
+        <linearGradient id="fbsoft" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#8a5f16" />
+          <stop offset=".25" stop-color="#b8860b" />
+          <stop offset=".5" stop-color="#d4af37" />
+          <stop offset=".75" stop-color="#b8860b" />
+          <stop offset="1" stop-color="#8a5f16" />
+        </linearGradient>
+        <symbol id="pyr" viewBox="0 0 60 48">
+          <polygon points="30,2 58,46 2,46" fill="url(#goldgrad)" stroke="#7c5514" stroke-width="2" />
+          <polygon points="30,2 58,46 30,46" fill="#a97c22" opacity=".55" />
+          <path d="M14 34h32M20 25h20M25 16h10" stroke="#7c5514" stroke-width="1.6" fill="none" />
+        </symbol>
+        </defs>
+    </svg>
+
+    <!-- TOP INFO BAR: the thin strip above the header.
+         EDIT: HOURS / ADDRESS / PHONE NUMBER - this is one of several
+         places they appear. The phone link works in two parts:
+         href="tel:+13034691831" is the number the phone dials, and
+         (303) 469-1831 is the text people read. Change both. -->
+    <div class="topbar">
+      <div class="wrap">
+        <span>Open Daily 11:00 AM – 9:00 PM</span>
+        <span>10250 Federal Blvd, Unit 300, Federal Heights, CO 80260</span>
+        <a href="tel:+13034691831">Call (303) 469-1831</a>
+      </div>
+    </div>
+
+    <!-- SITE HEADER (sticky): logo, main navigation and call button.
+         Each nav link's href="#menu" style address is what the
+         JavaScript uses to switch pages. data-nav must match the page
+         name (home, menu, order, reviews, about, visit) or the link
+         will not highlight or route correctly.
+         EDIT: PHONE NUMBER - the red call button at the end of the nav
+         list below is another copy of the number (href + text). -->
+    <header class="site">
+      <div class="wrap navrow">
+        <a class="brand" href="#home" data-nav="home" aria-label="Cleopatra Grill and Hummus — home">
+          <img class="brand-logo" src="assets/logo.png" alt="Cleopatra Grill and Hummus logo" width="1200" height="400" />
+        </a>
+        <button class="navtoggle" id="navToggle" type="button" aria-expanded="false" aria-controls="mainnav" aria-label="Open menu">
+          <span class="navtoggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span>Menu</span>
+        </button>
+        <nav class="main" id="mainnav" aria-label="Main navigation">
+          <ul>
+            <li><a href="#home" data-nav="home">Home</a></li>
+            <li><a href="#menu" data-nav="menu">Menu</a></li>
+            <li><a href="#order" data-nav="order">Order Online</a></li>
+            <li><a href="#reviews" data-nav="reviews">Reviews</a></li>
+            <li><a href="#about" data-nav="about">About Us</a></li>
+            <li><a href="#visit" data-nav="visit">Visit Us</a></li>
+            <li><a class="callbtn" href="tel:+13034691831">&#9742; (303) 469-1831</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Decorative hieroglyph band: the same gold-on-red SVG artwork
+         chunk repeated across the width. Pure decoration (aria-hidden
+         keeps screen readers from announcing it). It appears twice on
+         the page: here under the header, and again above the footer.
+         You never need to edit the SVG path data inside. -->
+    <div class="glyphband" aria-hidden="true">
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+    </div>
+
+    <!-- ================================================================
+         MAIN CONTENT: the six pages of the site, one <div class="page">
+         each. Only the page whose id matches the address hash is shown
+         (the JavaScript adds class "active" to it). Page order here:
+         Home, Menu, Order, Reviews, About, Visit.
+         ================================================================ -->
+    <main>
+      <!-- ================= HOME ================= -->
+      <div class="page" id="page-home">
+        <section class="hero">
+          <div class="hero-grid">
+            <div class="hero-text">
+              <h1>Egyptian &amp; Mediterranean Flavor, <span class="gold">Fit for a Queen</span></h1>
+              <p class="tagline">Mediterranean eatery serving grilled meats, homemade appetizers, and variety-filled baklava.</p>
+              <p class="lede">Serving Federal Heights for 17 years — dine in, call ahead for takeout, or order delivery. Open daily, 11 AM to 9 PM.</p>
+              <div class="badges">
+                <span class="badge">17 Years in Federal Heights</span>
+                <span class="badge">Dine-In</span>
+                <span class="badge">Takeout</span>
+                <span class="badge">Delivery</span>
+                <span class="badge">&#9733; 4.3 · Hundreds of Guest Reviews</span>
+              </div>
+              <div class="cta-row">
+                <a class="btn btn-red" href="#menu" data-nav="menu">See the Full Menu</a>
+                <a class="btn btn-gold" href="#order" data-nav="order">Order Online</a>
+                <a class="btn btn-outline" href="tel:+13034691831">Call (303) 469-1831</a>
+              </div>
+            </div>
+            <!-- EDIT: PHOTOS - the hero slideshow. Each photo is one
+                 <figure class="slide"> below: change the img src to
+                 use a different picture from the assets/ folder, and
+                 update the caption text (dish name, description and
+                 price) inside <figcaption> to match. The first slide
+                 also needs class "on" - that is the photo shown first.
+                 To add a photo, copy a whole <figure class="slide">
+                 block and change its contents; the dots and timing are
+                 handled automatically by the JavaScript. -->
+            <figure style="margin:0">
+              <div class="slideshow" id="slideshow" aria-roledescription="carousel" aria-label="Photos of Cleopatra Grill and Hummus dishes">
+                <figure class="slide on" style="margin:0">
+                  <img src="assets/gyro-plate.jpg" alt="Gyro plate with sliced gyro meat over yellow rice, pita bread and tzatziki sauce" />
+                  <figcaption>Gyro Plate <span>Sliced gyro over golden rice with warm pita &amp; tzatziki — $18.95</span></figcaption>
+                </figure>
+                <figure class="slide" style="margin:0">
+                  <img src="assets/chicken-kabob.jpg" alt="Two charbroiled chicken kabob skewers over yellow rice with hummus" loading="lazy" />
+                  <figcaption>Chicken Kabob <span>Charbroiled skewers over rice with our signature hummus — $18.95</span></figcaption>
+                </figure>
+                <figure class="slide" style="margin:0">
+                  <img src="assets/lamb-chops.jpg" alt="Grilled lamb chops and chicken served over seasoned yellow rice" loading="lazy" />
+                  <figcaption>Lamb Chops <span>Specially seasoned and broiled, served over golden rice — $21.95</span></figcaption>
+                </figure>
+                <figure class="slide" style="margin:0">
+                  <img src="assets/mezze-sampler.jpg" alt="Mezze sampler platter with hummus, tzatziki, spanakopita, feta and seasoned meat on pita" loading="lazy" />
+                  <figcaption>Mezze Sampler <span>Hummus, tzatziki, spanakopita and more, made to share</span></figcaption>
+                </figure>
+                <figure class="slide" style="margin:0">
+                  <img src="assets/falafel.jpg" alt="Four crispy falafel patties on lettuce with a bowl of yogurt dip" loading="lazy" />
+                  <figcaption>Falafel <span>Crisp outside, tender inside — with tahini or yogurt dip — $7.95</span></figcaption>
+                </figure>
+                <figure class="slide" style="margin:0">
+                  <img src="assets/fattoush.jpg" alt="Fatouch salad with toasted pita chips, romaine and citrus vinaigrette" loading="lazy" />
+                  <figcaption>Fatouch Salad <span>Toasted pita chips and citrus vinaigrette — $8.95</span></figcaption>
+                </figure>
+                <figure class="slide" style="margin:0">
+                  <img src="assets/veggie-takeout.jpg" alt="Takeout box with falafel, grape leaves, hummus and a fresh side salad" loading="lazy" />
+                  <figcaption>Takeout Favorites <span>Falafel, grape leaves and hummus, ready to go</span></figcaption>
+                </figure>
+                <figure class="slide" style="margin:0">
+                  <img src="assets/baklava.jpg" alt="Two pieces of pistachio baklava on a white plate" loading="lazy" />
+                  <figcaption>Pistachio Baklava <span>Flaky fillo, nuts and rose water syrup — $3.75</span></figcaption>
+                </figure>
+                <button class="slidenav prev" id="slidePrev" aria-label="Previous photo">&#8249;</button>
+                <button class="slidenav next" id="slideNext" aria-label="Next photo">&#8250;</button>
+                <div class="dots" id="slideDots" role="tablist" aria-label="Choose photo"></div>
+              </div>
+            </figure>
+          </div>
+        </section>
+
+        <div class="marquee-zone">
+          <h2>What Our Guests Say</h2>
+          <!-- Scrolling reviews strip. This box is EMPTY in the HTML
+               on purpose: the JavaScript fills it from the REVIEWS list
+               at the bottom of the file. To change a review, edit it
+               there (search for EDIT: REVIEWS), not here. -->
+          <div class="marquee" aria-label="Customer reviews">
+            <div class="marquee-track" id="marqueeTrack"></div>
+          </div>
+        </div>
+
+        <section class="block">
+          <div class="wrap">
+            <div class="sec-head">
+              
+              <h2>Most Popular</h2>
+              <p>The dishes our guests order again and again — ranked by DoorDash diners, with the Gyro Sandwich the #1 most liked item on the menu.</p>
+            </div>
+            <!-- EDIT: PRICES AND PHOTOS - the five "Most Popular" cards
+                 are the <article class="pop-card"> blocks just below.
+                 Each card has a photo (img src in assets/), a dish name,
+                 a short description and a price in <span class="price">.
+                 Note: these same dishes and prices ALSO appear on the
+                 Menu page - if a price changes, update it in both
+                 places so the site agrees with itself. -->
+            <div class="pop-controls">
+              <span class="hint" aria-hidden="true">Scroll for all five favorites</span>
+              <button class="pop-arrow" id="popPrev" type="button" aria-label="Scroll popular dishes back">&#8592;</button>
+              <button class="pop-arrow" id="popNext" type="button" aria-label="Scroll popular dishes forward">&#8594;</button>
+            </div>
+            <div class="pop-scroller-shell">
+            <div class="pop-grid" id="popScroller" tabindex="0" aria-label="Most popular dishes — scroll sideways to see all five">
+              <article class="pop-card">
+                <img src="assets/gyro-sandwich.jpg" alt="Gyro sandwich wrapped in foil in a warm pita with lettuce and tzatziki, on a white plate" loading="lazy" />
+                <div class="body">
+                  <h3>Gyro Sandwich</h3>
+                  <p>Seasoned gyro wrapped in a warm pita with lettuce, tomato and tzatziki sauce.</p>
+                  <div class="row"><span class="price">$7.95</span><span class="tag">#1 Most Liked</span></div>
+                </div>
+              </article>
+              <article class="pop-card">
+                <img src="assets/gyro-plate.jpg" alt="Gyro plate with sliced gyro over yellow rice, pita and tzatziki" loading="lazy" />
+                <div class="body">
+                  <h3>Gyro Plate</h3>
+                  <p>A generous mound of gyro meat on a bed of rice, with hummus, homemade pita and salad.</p>
+                  <div class="row"><span class="price">$18.95</span><span class="tag">#2 Most Liked</span></div>
+                </div>
+              </article>
+              <article class="pop-card">
+                <img src="assets/falafel.jpg" alt="Side falafel — four crispy patties with dip" loading="lazy" />
+                <div class="body">
+                  <h3>Side Falafel</h3>
+                  <p>Four crispy falafel patties served with tahini sauce. The falafel reviewers call the best in Denver.</p>
+                  <div class="row"><span class="price">$7.95</span><span class="tag">#3 Most Liked</span></div>
+                </div>
+              </article>
+              <article class="pop-card">
+                <img src="assets/hummus.jpg" alt="A generous swirl of Cleopatra's hummus with olive oil and paprika, served with pita" loading="lazy" />
+                <div class="body">
+                  <h3>Hummus</h3>
+                  <p>Chickpeas pureed with sesame sauce, lemon juice, garlic and olive oil, served with pita.</p>
+                  <div class="row"><span class="price">$7.95</span><span class="tag">Most Popular</span></div>
+                </div>
+              </article>
+              <article class="pop-card">
+                <img src="assets/baklava.jpg" alt="Pistachio baklava pieces on a white plate" loading="lazy" />
+                <div class="body">
+                  <h3>Pistachio Baklava</h3>
+                  <p>Flaky fillo layered with pistachio — one of several baklava varieties on the menu, from classic walnut to chocolate toffee.</p>
+                  <div class="row"><span class="price">$3.75</span><span class="tag">Most Popular</span></div>
+                </div>
+              </article>
+            </div>
+            </div>
+            <p style="text-align:center; margin-top:1.6rem">
+              <a class="btn btn-red" href="#menu" data-nav="menu">Browse the Full Menu</a>
+            </p>
+          </div>
+        </section>
+
+        <section class="block lunch-band">
+          <div class="wrap">
+            <div class="sec-head">
+              
+              <h2>Great for Lunch</h2>
+              <p>We open at 11:00 AM every day — and lunch at Cleopatra is quick, fresh, and easy on the wallet. Dine in, call ahead for takeout, or order pickup online.</p>
+            </div>
+            <!-- EDIT: PRICES - the three lunch cards. The dish prices
+                 in the first two cards are plain text inside
+                 <span class="pr">. They repeat prices from the Menu
+                 page, so keep them in step if prices change. The third
+                 card repeats the phone number and opening time. -->
+            <div class="lunch-grid">
+              <div class="lunch-card">
+                <h3>Every Sandwich — $7.95</h3>
+                <ul>
+                  <li><span>Gyro Sandwich</span><span class="pr">$7.95</span></li>
+                  <li><span>Falafel Sandwich</span><span class="pr">$7.95</span></li>
+                  <li><span>Chicken Shawarma Sandwich</span><span class="pr">$7.95</span></li>
+                  <li><span>Beef Kabob Sandwich</span><span class="pr">$7.95</span></li>
+                  <li><span>Chicken Kabob Sandwich</span><span class="pr">$7.95</span></li>
+                </ul>
+              </div>
+              <div class="lunch-card">
+                <h3>Salads, Soup &amp; Plates</h3>
+                <ul>
+                  <li><span>Fatouch Salad</span><span class="pr">$8.95</span></li>
+                  <li><span>Greek Salad</span><span class="pr">$8.95</span></li>
+                  <li><span>Lentil Soup</span><span class="pr">$5.95</span></li>
+                  <li><span>Falafel Plate</span><span class="pr">$17.95</span></li>
+                  <li><span>Gyro Plate</span><span class="pr">$18.95</span></li>
+                </ul>
+              </div>
+              <div class="lunch-card">
+                <h3>Lunch, Your Way</h3>
+                <p>Open at <strong>11:00 AM daily</strong> — right when lunch starts. Grab a table in the dining room, call <a href="tel:+13034691831"><strong>(303) 469-1831</strong></a> and your takeout will be waiting, or order ahead for pickup on any delivery app.</p>
+                <p style="margin-top:.9rem">
+                  <a class="btn btn-gold" href="#order" data-nav="order" style="width:100%">Order Lunch Online</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <hr class="divider" />
+
+        <section class="block">
+          <div class="wrap about-grid">
+            <div>
+              <h2 style="font-size:clamp(1.6rem,3.6vw,2.2rem); color:var(--red-deep); margin-bottom:.7rem">A Federal Heights Favorite for 17 Years</h2>
+              <p>Tucked into the shopping center at 10250 Federal Blvd, Cleopatra Grill &amp; Hummus has spent 17 years serving the food of Egypt and the Mediterranean — gyros, kabobs, shawarma, falafel, and hummus made from chickpeas, sesame sauce, lemon, garlic and olive oil.</p>
+              <p>Step inside and the theme surrounds you: pyramid paintings, a hand-painted mural of Cleopatra beneath a winged sun disc, and hieroglyphic borders framing the windows — the same artwork you&rsquo;ll see on our storefront. Come hungry: plates arrive piled with golden rice, fresh salad, hummus and warm homemade pita.</p>
+              <div class="stat-row">
+                <div class="stat"><b>17</b><span>Years Serving the Community</span></div>
+                <div class="stat"><b>Full</b><span>Menu On Site, With Prices</span></div>
+                <div class="stat"><b>4.3 &#9733;</b><span>Across Hundreds of Online Reviews</span></div>
+              </div>
+            </div>
+            <figure>
+              <div class="photo-frame"><img src="assets/storefront.jpg" alt="Cleopatra Grill and Hummus storefront with Egyptian artwork, pharaoh masks and winged sun discs framing the windows" loading="lazy" /></div>
+              <figcaption>Our storefront at 10250 Federal Blvd — look for the pharaohs and the winged sun disc.</figcaption>
+            </figure>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= MENU ================= -->
+      <div class="page" id="page-menu">
+        <section class="block">
+          <div class="wrap">
+            <div class="sec-head">
+              
+              <h2>Our Menu</h2>
+              <p>The full Cleopatra menu — appetizers, salads, sandwiches, charbroiled entrées, vegetarian plates, combos, desserts and drinks. Entrée plates come with hummus, homemade pita bread, rice and salad with citrus vinaigrette.</p>
+            </div>
+            <!-- Menu category pills: tapping one smooth-scrolls to
+                 that part of the menu (JavaScript handles the scroll).
+                 Each pill's data-cat must match the id of its menu
+                 section below, e.g. data-cat="cat-salads" scrolls to
+                 <div class="menu-cat" id="cat-salads">. -->
+            <nav class="catnav" aria-label="Menu categories">
+              <a href="#cat-popular" data-cat="cat-popular">Most Popular</a>
+              <a href="#cat-appetizers" data-cat="cat-appetizers">Appetizers</a>
+              <a href="#cat-salads" data-cat="cat-salads">Soup &amp; Salads</a>
+              <a href="#cat-sandwiches" data-cat="cat-sandwiches">Sandwiches</a>
+              <a href="#cat-meat" data-cat="cat-meat">Meat Entrées</a>
+              <a href="#cat-poultry" data-cat="cat-poultry">Poultry Entrées</a>
+              <a href="#cat-veg" data-cat="cat-veg">Vegetarian</a>
+              <a href="#cat-combos" data-cat="cat-combos">Combos</a>
+              <a href="#cat-dessert" data-cat="cat-dessert">Desserts</a>
+              <a href="#cat-drinks" data-cat="cat-drinks">Drinks</a>
+            </nav>
+
+            <!-- ====================================================
+                 EDIT: MENU ITEMS AND PRICES - this is the full menu.
+                 Every dish is one <li> line in the lists below, in
+                 this pattern:
+                   <li><span class="name">Dish Name</span><span class="pr">$7.95</span><span class="desc">Description.</span></li>
+                 - Change a price: edit the number inside class="pr".
+                 - Rename a dish: edit the text inside class="name".
+                 - Add a dish: copy any <li> line in the right
+                   category, paste it in, and change the three parts.
+                 - Remove a dish: delete its whole <li> line.
+                 - The <span class="desc"> part is optional; items
+                   without a description simply leave it out.
+                 Categories are the <div class="menu-cat"> blocks, each
+                 with an <h3> title. Prices here are the restaurant's
+                 in-store prices; delivery apps may charge more.
+                 ==================================================== -->
+            <div class="menu-cat" id="cat-popular">
+              <h3>Most Popular</h3>
+              <p class="note">Ranked by our DoorDash guests — the Gyro Sandwich is the #1 most liked item in the house.</p>
+              <ul class="menu-list">
+                <li><span class="name">Gyro Sandwich <span class="tag">#1 Most Liked</span></span><span class="pr">$7.95</span><span class="desc">Wrapped in a pita with lettuce, tomato and tzatziki sauce.</span></li>
+                <li><span class="name">Gyro Plate <span class="tag">#2 Most Liked</span></span><span class="pr">$18.95</span><span class="desc">Gyro meat on a bed of rice, with hummus, homemade pita and salad.</span></li>
+                <li><span class="name">Side Falafel <span class="tag">#3 Most Liked</span></span><span class="pr">$7.95</span><span class="desc">4 patties served with tahini sauce.</span></li>
+                <li><span class="name">Hummus <span class="tag">Most Popular</span></span><span class="pr">$7.95</span><span class="desc">Puree of chickpeas, sesame sauce, lemon juice, garlic and olive oil, served with pita.</span></li>
+                <li><span class="name">Baklava <span class="tag">Most Popular</span></span><span class="pr">$3.75</span><span class="desc">Layers of buttered fillo dough stuffed with walnuts and cinnamon, drizzled with rose water syrup.</span></li>
+              </ul>
+            </div>
+
+            <div class="menu-cat" id="cat-appetizers">
+              <h3>Appetizers &amp; Side Dishes</h3>
+              <ul class="menu-list">
+                <li><span class="name">Grilled Mushroom</span><span class="pr">$7.95</span><span class="desc">Mushrooms marinated in our special spices.</span></li>
+                <li><span class="name">Side Falafel</span><span class="pr">$7.95</span><span class="desc">4 patties served with tahini sauce.</span></li>
+                <li><span class="name">Grape Leaves</span><span class="pr">$7.95</span><span class="desc">Vegetarian stuffed grape leaves.</span></li>
+                <li><span class="name">Baba Ghanouj</span><span class="pr">$7.95</span><span class="desc">Puree of baked eggplant, sesame sauce, chopped walnuts, lemon juice, pomegranate sauce, garlic and olive oil, served with pita.</span></li>
+                <li><span class="name">Hummus</span><span class="pr">$7.95</span><span class="desc">Puree of chickpeas, sesame sauce, lemon juice, garlic and olive oil, served with pita.</span></li>
+                <li><span class="name">Fava Beans</span><span class="pr">$7.95</span><span class="desc">Mixed with olive oil, lemon juice and garlic, topped with diced tomatoes and parsley.</span></li>
+                <li><span class="name">Lamb Pie</span><span class="pr">$7.95</span><span class="desc">A mixture of ground lamb, peanuts, onions, tomatoes, pomegranate sauce and spices.</span></li>
+                <li><span class="name">Spanakopita</span><span class="pr">$6.95</span><span class="desc">Fillo dough, spinach, onions, and feta cheese.</span></li>
+                <li><span class="name">Cheese Pie</span><span class="pr">$7.95</span><span class="desc">Feta cheese baked on bread dough.</span></li>
+                <li><span class="name">Mana-Ish</span><span class="pr">$7.95</span><span class="desc">A mixture of spices, sesame seeds and olive oil, baked on a thin dough crust.</span></li>
+                <li><span class="name">Two Pieces Fried Stuffed Kibbi</span><span class="pr">$8.95</span><span class="desc">Ground meat in a crispy shell of cracked wheat and lean meat with special spices, served with cucumber yogurt dip.</span></li>
+                <li><span class="name">Side Pickles</span><span class="pr">$6.95</span><span class="desc">Pickled cucumbers, olives and turnips.</span></li>
+                <li><span class="name">French Fries</span><span class="pr">$3.95</span></li>
+                <li><span class="name">Garlic Dip</span><span class="pr">$7.95</span><span class="desc">Mayonnaise, garlic and olive oil.</span></li>
+                <li><span class="name">Side Rice</span><span class="pr">$3.95</span></li>
+                <li><span class="name">Side Pita Bread</span><span class="pr">$2.50</span></li>
+              </ul>
+            </div>
+
+            <div class="menu-cat" id="cat-salads">
+              <h3>Soup &amp; Salads</h3>
+              <ul class="menu-list">
+                <li><span class="name">Fatouch Salad</span><span class="pr">$8.95</span><span class="desc">Served with citrus vinaigrette.</span></li>
+                <li><span class="name">Fatouch Salad with Chicken Shawarma</span><span class="pr">$14.95</span><span class="desc">Served with citrus vinaigrette.</span></li>
+                <li><span class="name">Green Salad with Gyro</span><span class="pr">$12.95</span><span class="desc">Served with citrus vinaigrette.</span></li>
+                <li><span class="name">Green Salad</span><span class="pr">$7.95</span><span class="desc">Lettuce, tomatoes and cucumber. Served with citrus vinaigrette.</span></li>
+                <li><span class="name">Greek Salad</span><span class="pr">$8.95</span><span class="desc">Topped with feta, olives and pickles. Served with citrus vinaigrette.</span></li>
+                <li><span class="name">Green Salad with Chicken</span><span class="pr">$12.95</span><span class="desc">Topped with pieces of charbroiled boneless chicken. Served with citrus vinaigrette.</span></li>
+                <li><span class="name">Lentil Soup</span><span class="pr">$5.95</span></li>
+                <li><span class="name">Cucumber Yogurt</span><span class="pr">$7.95</span><span class="desc">Greek yogurt, cucumbers and mint.</span></li>
+                <li><span class="name">Greek Salad &amp; Chicken</span><span class="pr">$14.95</span><span class="desc">Topped with feta, olives and chicken.</span></li>
+                <li><span class="name">Greek Salad &amp; Gyro</span><span class="pr">$14.95</span><span class="desc">Topped with gyro meat and a side of tzatziki.</span></li>
+                <li><span class="name">Greek Salad &amp; Chicken Gyro</span><span class="pr">$14.95</span><span class="desc">Lettuce, tomatoes and cucumbers tossed in house dressing, topped with chicken gyro, feta, and Greek olives.</span></li>
+                <li><span class="name">Green Salad &amp; Chicken Gyro</span><span class="pr">$12.95</span><span class="desc">Lettuce, tomatoes and cucumbers tossed in house dressing, topped with chicken gyro.</span></li>
+              </ul>
+            </div>
+
+            <div class="menu-cat" id="cat-sandwiches">
+              <h3>Sandwiches</h3>
+              <p class="note">Every sandwich is wrapped in warm pita — all just $7.95.</p>
+              <!-- EDIT: PHOTOS - featured dish photo for this
+                   category. Change the img src to swap the picture;
+                   the caption underneath names the dish and price. -->
+              <figure class="menu-feature">
+                <img src="assets/gyro-sandwich.jpg" alt="Gyro sandwich wrapped in foil in a warm pita with lettuce and tzatziki, on a white plate" loading="lazy" />
+                <figcaption><b>The Gyro Sandwich</b> — our #1 most liked item, $7.95</figcaption>
+              </figure>
+              <ul class="menu-list">
+                <li><span class="name">Gyro Sandwich</span><span class="pr">$7.95</span><span class="desc">Wrapped in a pita with lettuce, tomato and tzatziki sauce.</span></li>
+                <li><span class="name">Falafel Sandwich</span><span class="pr">$7.95</span><span class="desc">3 fried patties of falafel wrapped in pita with tahini sauce, lettuce and tomato.</span></li>
+                <li><span class="name">Chicken Shawarma Sandwich</span><span class="pr">$7.95</span><span class="desc">Served with pickles and special sauce, wrapped in pita with tahini sauce, lettuce, tomatoes and hummus.</span></li>
+                <li><span class="name">Beef Kabob Sandwich</span><span class="pr">$7.95</span><span class="desc">Charbroiled cubes of marinated tender beef with special spices, wrapped in a pita with tahini sauce and salad.</span></li>
+                <li><span class="name">Kafta Kabob Sandwich</span><span class="pr">$7.95</span><span class="desc">1 skewer of ground lamb and beef, charbroiled, wrapped in pita with lettuce, tomatoes and hummus.</span></li>
+                <li><span class="name">Chicken Kabob Sandwich</span><span class="pr">$7.95</span><span class="desc">Marinated boneless cubes of chicken, charbroiled and wrapped in pita with lettuce, tomatoes and hummus.</span></li>
+                <li><span class="name">Chicken Kafta Sandwich</span><span class="pr">$7.95</span><span class="desc">1 skewer of ground chicken seasoned with special spices, charbroiled and wrapped in a pita with lettuce, tomatoes and hummus.</span></li>
+                <li><span class="name">Chicken Gyro Sandwich</span><span class="pr">$7.95</span><span class="desc">Chicken gyro, lettuce, tomatoes and tzatziki sauce wrapped in pita.</span></li>
+              </ul>
+            </div>
+
+            <div class="menu-cat" id="cat-meat">
+              <h3>Meat Entrées</h3>
+              <p class="note">Served with hummus, homemade pita bread, rice and salad with citrus vinaigrette.</p>
+              <ul class="menu-list">
+                <li><span class="name">Lamb Shank</span><span class="pr">$24.95</span><span class="desc">1 tender lamb shank marinated with special sauce.</span></li>
+                <li><span class="name">Lamb Chops</span><span class="pr">$21.95</span><span class="desc">4 baby spring lamb chops, specially seasoned and broiled.</span></li>
+                <li><span class="name">Kafta Kabob Koubideh</span><span class="pr">$18.95</span><span class="desc">2 charbroiled skewers of ground beef, seasoned with onions, parsley and spices.</span></li>
+                <li><span class="name">Gyro Plate</span><span class="pr">$18.95</span><span class="desc">Gyro meat on a bed of rice.</span></li>
+                <li><span class="name">Beef Kabob</span><span class="pr">$18.95</span><span class="desc">Charbroiled cubes of tender beef, marinated with onions and special spices.</span></li>
+                <li><span class="name">Fried Stuffed Kibbi</span><span class="pr">$19.95</span><span class="desc">3 pieces of stuffed kibbi served with cucumber yogurt and lentil soup.</span></li>
+                <li><span class="name">Mixed Grill</span><span class="pr">$21.95</span><span class="desc">Combination of charbroiled lamb chop and a skewer of kafta kabob and chicken kabob.</span></li>
+                <li><span class="name">Lamb Kafta Kabob</span><span class="pr">$18.95</span><span class="desc">Two skewers of grilled, ground, seasoned lamb. Served with rice, salad, hummus and pita.</span></li>
+              </ul>
+            </div>
+
+            <div class="menu-cat" id="cat-poultry">
+              <h3>Poultry Entrées</h3>
+              <p class="note">Served with hummus, homemade pita bread, rice and salad with citrus vinaigrette.</p>
+              <ul class="menu-list">
+                <li><span class="name">Chicken Kabob</span><span class="pr">$18.95</span><span class="desc">Charbroiled cubes of boneless chicken, marinated in special sauce and spices.</span></li>
+                <li><span class="name">Chicken Kafta Koubideh</span><span class="pr">$18.95</span><span class="desc">2 skewers of ground chicken seasoned with special spices and charbroiled.</span></li>
+                <li><span class="name">Chicken Sultani</span><span class="pr">$18.95</span><span class="desc">1 skewer of chicken kabob and 1 skewer of chicken kafta.</span></li>
+                <li><span class="name">Chicken Shawarma</span><span class="pr">$18.95</span><span class="desc">Marinated and seasoned chicken, rotisserie broiled and thinly sliced.</span></li>
+                <li><span class="name">Hummus with Chicken Shawarma</span><span class="pr">$18.95</span><span class="desc">Large plate of hummus topped with chicken shawarma.</span></li>
+                <li><span class="name">Chicken Gyro Plate</span><span class="pr">$18.95</span><span class="desc">Rice topped with seasoned chicken gyro. Served with salad, hummus, pita and tzatziki.</span></li>
+              </ul>
+            </div>
+
+            <div class="menu-cat" id="cat-veg">
+              <h3>Vegetarian Entrées</h3>
+              <ul class="menu-list">
+                <li><span class="name">Falafel Plate</span><span class="pr">$17.95</span><span class="desc">5 patties of ground chickpeas, onion, parsley, garlic and spices, deep fried in vegetable oil. Served with homemade pita bread, hummus, tahini sauce and salad with citrus vinaigrette.</span></li>
+                <li><span class="name">Vegetarian Sampler</span><span class="pr">$18.95</span><span class="desc">A combination of 6 vegetarian dishes: hummus, grape leaves, falafel, fatouch salad, baba ghanouj and mushrooms. Served with homemade pita bread and salad with citrus vinaigrette.</span></li>
+              </ul>
+            </div>
+
+            <div class="menu-cat" id="cat-combos">
+              <h3>Combo Entrées</h3>
+              <ul class="menu-list">
+                <li><span class="name">Cleopatra Mixed Grill</span><span class="pr">$37.95</span><span class="desc">1 shrimp skewer, 2 lamb chops and 4 different kinds of beef and chicken kabob, served with pita bread, rice, hummus and salad with citrus vinaigrette. A feast built for sharing.</span></li>
+                <li><span class="name">Shrimp and Rice</span><span class="pr">$17.95</span><span class="desc">2 skewers of shrimp served with rice and salad with citrus vinaigrette.</span></li>
+                <li><span class="name">Kafta Combo</span><span class="pr">$29.95</span><span class="desc">2 skewers of meat kabob and 2 skewers of chicken kabob, served with rice, hummus and salad with citrus vinaigrette.</span></li>
+                <li><span class="name">Pie Combo</span><span class="pr">$18.95</span><span class="desc">2 each of lamb, cheese and spinach pies, served with hummus, cucumber yogurt dip and salad with citrus vinaigrette.</span></li>
+              </ul>
+            </div>
+
+            <div class="menu-cat" id="cat-dessert">
+              <h3>Desserts</h3>
+              <ul class="menu-list">
+                <li><span class="name">Baklava</span><span class="pr">$3.75</span><span class="desc">Layers of buttered fillo dough stuffed with walnuts and cinnamon, drizzled with rose water syrup.</span></li>
+                <li><span class="name">Pistachio Baklava</span><span class="pr">$3.75</span></li>
+                <li><span class="name">Almond Baklava</span><span class="pr">$3.75</span></li>
+                <li><span class="name">Cashew Baklava</span><span class="pr">$3.75</span></li>
+                <li><span class="name">Chocolate Toffee Baklava</span><span class="pr">$3.75</span></li>
+                <li><span class="name">Peanut Butter &amp; Chocolate Baklava</span><span class="pr">$3.75</span></li>
+                <li><span class="name">Kunefe</span><span class="pr">$6.99</span><span class="desc">Shredded fillo dough with a sweet cheese filling, topped with homemade syrup and pistachios.</span></li>
+                <li><span class="name">Dubai Chocolate Cake</span><span class="pr">$10.95</span><span class="desc">Layers of chocolate cake and pistachio.</span></li>
+              </ul>
+            </div>
+
+            <div class="menu-cat" id="cat-drinks">
+              <h3>Beverages &amp; Hot Drinks</h3>
+              <ul class="menu-list">
+                <li><span class="name">Fountain Soda</span><span class="pr">$2.95</span><span class="desc">24 oz.</span></li>
+                <li><span class="name">Iced Tea</span><span class="pr">$2.95</span><span class="desc">24 oz.</span></li>
+                <li><span class="name">Frozen Lemonade</span><span class="pr">$3.95</span><span class="desc">24 oz.</span></li>
+                <li><span class="name">20oz Bottled Beverages</span><span class="pr">$2.95</span></li>
+                <li><span class="name">Aquafina Water</span><span class="pr">$1.95</span></li>
+                <li><span class="name">Life Wtr</span><span class="pr">$2.95</span><span class="desc">Purified water, pH balanced with electrolytes added for taste.</span></li>
+                <li><span class="name">Proud Source Spring Water</span><span class="pr">$2.95</span></li>
+                <li><span class="name">Proud Source Sparkling Water</span><span class="pr">$2.95</span></li>
+                <li><span class="name">Tea with Mint</span><span class="pr">$2.95</span></li>
+                <li><span class="name">Turkish Coffee</span><span class="pr">$2.95</span></li>
+                <li><span class="name">American Coffee</span><span class="pr">$2.95</span></li>
+              </ul>
+            </div>
+
+            <p style="text-align:center">
+              <a class="btn btn-gold" href="#order" data-nav="order">Ready to Eat? Order Online</a>
+              <a class="btn btn-outline" href="tel:+13034691831">Call (303) 469-1831</a>
+            </p>
+            <p style="text-align:center; color:var(--ink-soft); font-size:.92rem">Menu and prices as listed by the restaurant; delivery-platform prices may vary.</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= ORDER ================= -->
+      <div class="page" id="page-order">
+        <section class="block">
+          <div class="wrap">
+            <div class="sec-head">
+              
+              <h2>Order Cleopatra Online</h2>
+              <p>Dine in with us, call ahead for takeout, or get your favorites delivered through your preferred app — pickup and delivery are both available on each platform.</p>
+            </div>
+            <div class="serve-row">
+              <div class="serve"><h3>Dine-In</h3><p>Join us at 10250 Federal Blvd, Unit 300 — open daily 11 AM to 9 PM.</p></div>
+              <div class="serve"><h3>Takeout</h3><p>Call <a href="tel:+13034691831" style="color:var(--gold-pale); font-weight:700">(303) 469-1831</a> and your order will be hot and waiting.</p></div>
+              <div class="serve"><h3>Delivery</h3><p>Order through any of the six services below and dinner comes to you.</p></div>
+            </div>
+            <!-- ====================================================
+                 EDIT: DELIVERY LINKS - the six order buttons.
+                 Each platform is one <div class="order-card">: a name,
+                 a line of text, and a button whose href is that
+                 platform's store page for this restaurant. If a link
+                 ever changes (for example a new DoorDash store URL),
+                 replace ONLY the web address inside href="..." and
+                 leave target="_blank" rel="noopener" as they are -
+                 they make the link open in a new tab safely. The
+                 visitor picks pickup or delivery on the platform's
+                 own page, so one button per platform is correct.
+                 ==================================================== -->
+            <div class="order-grid">
+              <div class="order-card">
+                <h3>DoorDash</h3>
+                <p>Pickup or delivery from our DoorDash storefront.</p>
+                <a class="btn btn-red" href="https://order.online/store/-124439/?pickup=true" target="_blank" rel="noopener">Order on DoorDash</a>
+              </div>
+              <div class="order-card">
+                <h3>Caviar</h3>
+                <p>Pickup or delivery through Caviar.</p>
+                <a class="btn btn-red" href="https://www.trycaviar.com/store/cleopatra-federal-heights-124439/491564/" target="_blank" rel="noopener">Order on Caviar</a>
+              </div>
+              <div class="order-card">
+                <h3>Uber Eats</h3>
+                <p>Pickup or delivery through Uber Eats.</p>
+                <a class="btn btn-red" href="https://www.ubereats.com/store/cleopatra/1quCtAUdTVO4qocYTimXHA" target="_blank" rel="noopener">Order on Uber Eats</a>
+              </div>
+              <div class="order-card">
+                <h3>Seamless</h3>
+                <p>Delivery or pickup through Seamless.</p>
+                <a class="btn btn-red" href="https://www.seamless.com/menu/cleopatra-grill-and-hummus-10250-federal-blvd-federal-heights/868884" target="_blank" rel="noopener">Order on Seamless</a>
+              </div>
+              <div class="order-card">
+                <h3>Grubhub</h3>
+                <p>Delivery or pickup through Grubhub.</p>
+                <a class="btn btn-red" href="https://www.grubhub.com/restaurant/cleopatra-grill-and-hummus-10250-federal-blvd-federal-heights/868884" target="_blank" rel="noopener">Order on Grubhub</a>
+              </div>
+              <div class="order-card">
+                <h3>Postmates</h3>
+                <p>Pickup or delivery through Postmates.</p>
+                <a class="btn btn-red" href="https://postmates.com/store/cleopatra/1quCtAUdTVO4qocYTimXHA" target="_blank" rel="noopener">Order on Postmates</a>
+              </div>
+            </div>
+            <p class="order-note">Prefer to talk to a person? Call us at <a href="tel:+13034691831"><strong>(303) 469-1831</strong></a> for takeout orders.</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= REVIEWS ================= -->
+      <div class="page" id="page-reviews">
+        <section class="block">
+          <div class="wrap">
+            <div class="sec-head">
+              
+              <h2>Guest Reviews</h2>
+              <p>Rated 4.3 stars across hundreds of online reviews — here is what guests say about the hummus, the falafel, and the baklava.</p>
+            </div>
+            <!-- The review cards appear here, but this div is empty
+                 in the HTML: the JavaScript builds the cards from the
+                 REVIEWS list at the bottom of the file and drops them
+                 in. EDIT: REVIEWS - change the wording down there
+                 (search for EDIT: REVIEWS in the script). -->
+            <div class="rev-grid" id="revGrid"></div>
+            <p style="text-align:center; margin-top:1.8rem">
+              <a class="btn btn-red" href="#visit" data-nav="visit">Come Taste It Yourself</a>
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= ABOUT ================= -->
+      <div class="page" id="page-about">
+        <section class="block">
+          <div class="wrap">
+            <div class="sec-head">
+              
+              <h2>About Us</h2>
+              <p>Mediterranean eatery serving grilled meats, homemade appetizers, and variety-filled baklava.</p>
+            </div>
+            <h3 style="text-align:center; font-size:clamp(1.45rem,3.6vw,2rem); color:var(--red); margin-bottom:1.8rem">17 Years in Business Means We&rsquo;ve Done Something Right</h3>
+            <div class="about-grid">
+              <div>
+                <p>Cleopatra Grill &amp; Hummus is a family-owned restaurant that has been serving Federal Heights for 17 years. In a business where places come and go, 17 years of regulars, celebrations, and weeknight takeout orders means one thing: they&rsquo;ve done something right.</p>
+                <p>Everything here is made fresh in-house, from scratch — house recipes, prepared in our own kitchen, nothing shipped in pre-made. That&rsquo;s the Mediterranean and Middle Eastern cooking our guests come back for: grilled meats, homemade appetizers, and baklava in more varieties than you&rsquo;d expect. The restaurant describes itself simply as <strong>&ldquo;Denver&rsquo;s best Middle Eastern food&rdquo;</strong> — and after 17 years, plenty of Federal Heights agrees.</p>
+                <p>You&rsquo;ll find us at 10250 Federal Blvd in the Federal Plaza Shopping Center, behind Chick-fil-A near 103rd and Federal. Come in for the food, stay for the artwork: pyramid paintings, Cleopatra herself beneath a winged sun disc, and hieroglyphic borders throughout the dining room.</p>
+                <div class="stat-row">
+                  <div class="stat"><b>17</b><span>Years in Business</span></div>
+                  <div class="stat"><b>Family</b><span>Owned &amp; Operated</span></div>
+                  <div class="stat"><b>Fresh</b><span>Made In-House, From Scratch</span></div>
+                </div>
+                <!-- PLACEHOLDER for the owners: this dashed box is
+                     reserved for the restaurant's own story, in their
+                     own words. When they provide it, replace the
+                     heading and paragraph text inside this div with
+                     their text (and you can then delete this comment). -->
+                <div class="story-placeholder">
+                  
+                  <h3>The Cleopatra Story — In Their Own Words</h3>
+                  <p>This space is reserved for the owners of Cleopatra Grill &amp; Hummus to share their story — how the restaurant began, and what 17 years at Federal Blvd has meant to them — told in their own words.</p>
+                </div>
+              </div>
+              <!-- EDIT: PHOTOS - the About page photos (dining room
+                   and storefront). Swap the img src to change a photo;
+                   keep the alt text accurate for accessibility and
+                   search engines, and update the <figcaption> caption
+                   under each photo to match. -->
+              <div style="display:grid; gap:1.2rem; align-content:start">
+                <figure style="margin:0">
+                  <div class="photo-frame"><img src="assets/dining-room.jpg" alt="The Cleopatra Grill and Hummus dining room with pyramid landscape paintings, wooden tables and warm red and gold decor" loading="lazy" /></div>
+                  <figcaption style="font-size:.9rem; color:var(--ink-soft); margin-top:.5rem; text-align:center">Inside the dining room — pyramid paintings, warm reds and golds, and room for the whole family.</figcaption>
+                </figure>
+                <figure style="margin:0">
+                  <div class="photo-frame"><img src="assets/storefront.jpg" alt="Cleopatra Grill and Hummus storefront with Egyptian artwork framing the windows" loading="lazy" /></div>
+                  <figcaption style="font-size:.9rem; color:var(--ink-soft); margin-top:.5rem; text-align:center">Our storefront in the Federal Plaza Shopping Center, at 10250 Federal Blvd.</figcaption>
+                </figure>
+              </div>
+            </div>
+            <p style="text-align:center; margin-top:2rem">
+              <a class="btn btn-red" href="#menu" data-nav="menu">See What&rsquo;s Cooking</a>
+              <a class="btn btn-outline" href="#visit" data-nav="visit">Plan Your Visit</a>
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= VISIT ================= -->
+      <div class="page" id="page-visit">
+        <section class="block">
+          <div class="wrap">
+            <div class="sec-head">
+              
+              <h2>Visit Us</h2>
+              <p>Find us in Federal Heights, just off Federal Blvd — free parking, friendly faces, and the smell of the grill from the door.</p>
+            </div>
+            <div class="visit-grid">
+              <div style="display:grid; gap:1.2rem; align-content:start">
+                <!-- EDIT: ADDRESS / PHONE NUMBER / INSTAGRAM - the
+                     "Find Us" card. The phone appears as a tel: link
+                     (dialled number) plus readable text; change both.
+                     The Get Directions button below links to Google
+                     Maps with the address written into the URL - if
+                     the address changes, update that URL too. -->
+                <div class="info-card">
+                  <h3>Find Us</h3>
+                  <p style="margin:.2rem 0 .6rem">
+                    <strong>Cleopatra Grill &amp; Hummus</strong><br />
+                    10250 Federal Blvd, Unit 300<br />
+                    Federal Heights, CO 80260
+                  </p>
+                  <p style="margin:.2rem 0 .8rem">Phone: <a class="big-link" href="tel:+13034691831">(303) 469-1831</a></p>
+                  <p style="margin:.2rem 0 1rem">Follow us on Instagram:
+                    <a href="https://www.instagram.com/cleopatra.grill.and.hummus" target="_blank" rel="noopener"><strong>@cleopatra.grill.and.hummus</strong></a>
+                  </p>
+                  <a class="btn btn-gold" href="https://www.google.com/maps/dir/?api=1&amp;destination=Cleopatra+Grill+and+Hummus+10250+Federal+Blvd+Unit+300+Federal+Heights+CO+80260" target="_blank" rel="noopener">Get Directions</a>
+                </div>
+                <!-- EDIT: HOURS - the hours table. One <tr> per day;
+                     data-day is the day number the JavaScript uses to
+                     highlight today (0 = Sunday, 1 = Monday, ... 6 =
+                     Saturday), so keep the data-day values as they are
+                     and only change the time text. IMPORTANT: if the
+                     opening or closing TIME changes, also update:
+                     (1) the top info bar text, (2) the footer hours,
+                     (3) the JSON-LD block in the <head>, and (4) the
+                     11 and 21 numbers in the "open now" JavaScript at
+                     the bottom of the file (it is marked EDIT there). -->
+                <div class="info-card">
+                  <h3>Hours</h3>
+                  <table class="hours" id="hoursTable">
+                    <tr data-day="1"><td>Monday</td><td>11:00 AM – 9:00 PM</td></tr>
+                    <tr data-day="2"><td>Tuesday</td><td>11:00 AM – 9:00 PM</td></tr>
+                    <tr data-day="3"><td>Wednesday</td><td>11:00 AM – 9:00 PM</td></tr>
+                    <tr data-day="4"><td>Thursday</td><td>11:00 AM – 9:00 PM</td></tr>
+                    <tr data-day="5"><td>Friday</td><td>11:00 AM – 9:00 PM</td></tr>
+                    <tr data-day="6"><td>Saturday</td><td>11:00 AM – 9:00 PM</td></tr>
+                    <tr data-day="0"><td>Sunday</td><td>11:00 AM – 9:00 PM</td></tr>
+                  </table>
+                  <p style="margin:.7rem 0 0; color:var(--ink-soft)" id="openStatus">Open seven days a week for dine-in, takeout and delivery.</p>
+                </div>
+              </div>
+              <figure>
+                <div class="photo-frame"><img src="assets/storefront.jpg" alt="Cleopatra Grill and Hummus storefront windows decorated with Egyptian pharaoh artwork and the restaurant logo" /></div>
+                <figcaption>Look for the Egyptian artwork on the windows at 10250 Federal Blvd — Chicken Shawarma, Lamb Chops, Hummus, Gyros, Falafel and Kabobs, just like the windows promise.</figcaption>
+              </figure>
+            </div>
+            <!-- MAP: the gold-framed map box. The empty #visitMap div
+                 is where the JavaScript draws the live interactive map
+                 the first time someone opens the Visit page. Hidden
+                 inside is #mapFallback, a static map picture
+                 (assets/map-static.png) that the JavaScript shows
+                 instead if the live map cannot load, so visitors always
+                 see a map. The restaurant's latitude/longitude live in
+                 the JavaScript (search for "lat:" down there). -->
+            <div class="map-frame">
+              <div class="map-box">
+                <div id="visitMap" role="img" aria-label="Map — Cleopatra Grill and Hummus, 10250 Federal Blvd, Unit 300, Federal Heights, CO 80260"></div>
+                <div class="map-fallback" id="mapFallback">
+                  <img src="assets/map-static.png" width="1100" height="340" alt="Map of the area around Cleopatra Grill and Hummus at 10250 Federal Blvd, Federal Heights, CO — the pin sits just south of West 103rd Avenue on Federal Blvd, next to Chick-fil-A" />
+                </div>
+              </div>
+            </div>
+            <p class="map-credit"><a href="https://www.facebook.com/maps/attribution_terms" target="_blank" rel="noopener">&copy; OpenStreetMap contributors, Map Data Legal Notices</a></p>
+            <p style="text-align:center; margin-top:1.2rem">
+              <a class="btn btn-red" href="https://www.google.com/maps/dir/?api=1&amp;destination=Cleopatra+Grill+and+Hummus+10250+Federal+Blvd+Unit+300+Federal+Heights+CO+80260" target="_blank" rel="noopener">Get Directions</a>
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Decorative hieroglyph band: the same gold-on-red SVG artwork
+         chunk repeated across the width. Pure decoration (aria-hidden
+         keeps screen readers from announcing it). It appears twice on
+         the page: here under the header, and again above the footer.
+         You never need to edit the SVG path data inside. -->
+    <div class="glyphband" aria-hidden="true">
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+      <svg class="glyphchunk" viewBox="0 0 400 46" aria-hidden="true"><g fill="none" stroke="#ecd28e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><!-- pharaoh mask, as painted on the storefront windows -->
+          <g transform="translate(2,1)"><path class="g" d="M21 1 C12 1 7 8 6 17 L4 41 L38 41 L36 17 C35 8 30 1 21 1 Z"/><ellipse class="g" cx="21" cy="18" rx="7.5" ry="9.5"/><path class="g" d="M7 26 H14 M7 32 H14 M28 26 H35 M28 32 H35"/><path class="g" d="M13 9 C16 5 26 5 29 9"/><circle class="gf" cx="21" cy="6" r="1.7"/><path class="g" d="M21 27.5 V34"/></g>
+          <!-- Horus falcon -->
+          <g transform="translate(54,1)"><path class="g" d="M17 2 C12 2 8 6 8 10 L3 14 L9 15 C10 18 12 20 15 21 C14 28 15 35 17 41"/><path class="g" d="M17 2 C23 6 26 13 25 21 C24 29 21 36 17 41"/><path class="g" d="M20 12 C22 18 21 25 18 31"/><circle class="gf" cx="12.5" cy="8" r="1.6"/><path class="g" d="M10 41 H28"/></g>
+          <!-- ankh -->
+          <g transform="translate(96,4)"><ellipse class="g" cx="9" cy="8" rx="5.5" ry="7"/><path class="g" d="M9 15 V36 M1 21 H17"/></g>
+          <!-- Nefertiti profile -->
+          <g transform="translate(124,1)"><path class="g" d="M12 2 H28 L29 13 H11 Z"/><path class="g" d="M11 7 H29"/><path class="g" d="M11 13 C9.5 16.5 9.5 19.5 10.5 22.5 L7.5 26.5 L11.5 27.5 C11.5 30.5 13.5 32.5 16.5 33.5"/><path class="g" d="M16.5 33.5 C16 36.5 14.5 39 11 41 H31 C28 38 27 33 27 27 L27 13"/><circle class="gf" cx="14.5" cy="19" r="1.5"/></g>
+          <!-- eye of horus -->
+          <g transform="translate(166,7)"><path class="g" d="M2 12 Q16 0 32 12 Q16 20 2 12 Z"/><circle cx="17" cy="11" r="4" fill="#ecd28e" stroke="none"/><path class="g" d="M11 19 q-2 6 -8 7 M24 19 q4 5 2 9"/></g>
+          <!-- standing pharaoh with staff -->
+          <g transform="translate(210,1)"><circle class="g" cx="12" cy="5" r="3.6"/><path class="g" d="M12 9 V20"/><path class="g" d="M6 20 H18 L16 29 H8 Z"/><path class="g" d="M10 29 L5 41 M15 29 L20 41"/><path class="g" d="M12 11 L4 17 M12 11 L21 16"/><path class="g" d="M23 6 V41"/></g>
+          <!-- scarab -->
+          <g transform="translate(246,4)"><ellipse class="g" cx="13" cy="15" rx="8" ry="10"/><path class="g" d="M5 10 C-2 4 -4 0 -3-2 M21 10 C28 4 30 0 29-2 M5 20 C-2 22 -5 26 -5 29 M21 20 C28 22 31 26 31 29 M13 5v20"/></g>
+          <!-- seated scribe -->
+          <g transform="translate(290,1)"><circle class="g" cx="11" cy="7" r="3.8"/><path class="g" d="M11 11 C7 16 5.5 22 5.5 28"/><path class="g" d="M10.5 15.5 L21 26"/><path class="g" d="M5.5 28 H29 L32 35 H7 Z"/><path class="g" d="M29 28 C31.5 31 32.5 34 32 40"/><path class="g" d="M3 40.5 H35"/></g>
+          <!-- sun disc -->
+          <g transform="translate(338,4)"><circle class="g" cx="14" cy="17" r="11"/><circle class="gf" cx="14" cy="17" r="3.5"/></g>
+          <!-- water -->
+          <g transform="translate(372,13)"><path class="g" d="M0 6 l6-5 6 5 6-5 6 5 M0 17 l6-5 6 5 6-5 6 5"/></g></g></svg>
+    </div>
+
+    <!-- FOOTER: shown under every page. Repeats the logo, quick nav
+         links, and the address / phone / hours one more time.
+         EDIT: PHONE NUMBER / ADDRESS / HOURS - remember this footer
+         copy when any of those change. The last line credits Inkscribe
+         with Sean's business phone number, (720) 998-2089 - that is
+         HIS number, not the restaurant's; do not "fix" it to match. -->
+    <footer>
+      <div class="wrap">
+        <div class="foot-grid">
+          <div class="foot-brand">
+            <span class="foot-logo-chip"><img class="foot-logo" src="assets/logo.png" alt="Cleopatra Grill and Hummus logo" width="1200" height="400" /></span>
+            <p style="margin-top:.8rem">Egyptian &amp; Mediterranean restaurant serving Federal Heights for 17 years. Dine-in, takeout and delivery, every day.</p>
+            <p><a href="https://www.instagram.com/cleopatra.grill.and.hummus" target="_blank" rel="noopener">Instagram — @cleopatra.grill.and.hummus</a></p>
+          </div>
+          <div>
+            <h3>Explore</h3>
+            <ul>
+              <li><a href="#home" data-nav="home">Home</a></li>
+              <li><a href="#menu" data-nav="menu">Full Menu</a></li>
+              <li><a href="#order" data-nav="order">Order Online</a></li>
+              <li><a href="#reviews" data-nav="reviews">Reviews</a></li>
+              <li><a href="#about" data-nav="about">About Us</a></li>
+              <li><a href="#visit" data-nav="visit">Hours &amp; Directions</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Visit or Call</h3>
+            <p>10250 Federal Blvd, Unit 300<br />Federal Heights, CO 80260</p>
+            <p><a href="tel:+13034691831">(303) 469-1831</a></p>
+            <p>Open Daily: 11:00 AM – 9:00 PM</p>
+          </div>
+        </div>
+        <div class="fineprint">
+          <span>&copy; Cleopatra Grill &amp; Hummus — Federal Heights, Colorado.</span>
+          <span>Demo concept website by Inkscribe &middot; (720) 998-2089</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ================================================================
+         SCRIPTS - all JavaScript lives at the bottom of the file so the
+         page content loads first.
+         The first two files are the map library (generated code - do
+         not edit them; the site script below just calls them):
+           assets/hatch-maps.js   - draws the interactive map tiles
+           assets/map_helpers.js  - helper the site script calls as
+                                    "MapHelpers" to place the pin
+         The third script, written out in full below, is this site's own
+         code. It is documented in plain language throughout.
+         ================================================================ -->
+    <script src="assets/hatch-maps.js"></script>
+    <script src="assets/map_helpers.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        /* ================================================================
+           JAVASCRIPT OVERVIEW - read this first, Sean.
+           ------------------------------------------------------------
+           This whole script is wrapped in (function () { ... })(); -
+           an "immediately invoked function". In plain terms it is a
+           private workspace: everything defined inside stays inside,
+           so its variable names can never collide with the map library
+           loaded above. "use strict" makes the browser enforce cleaner
+           code (it complains about common mistakes instead of silently
+           allowing them). Do not remove the wrapper or the last line
+           "})();" at the very bottom - without them the script will
+           not run at all.
+
+           The script does seven jobs, in file order:
+             1. REVIEWS      builds the scrolling review strip on Home
+                             and the review cards on the Reviews page.
+             2. PAGE ROUTING shows one of the six pages at a time based
+                             on the #hash in the address.
+             3. VISIT MAP    loads the interactive map (Visit page only).
+             4. MOBILE NAV   opens/closes the phone hamburger menu.
+             5. MENU CHIPS   smooth-scrolls the menu category pills.
+             6. SLIDESHOW    auto-plays the home page photos.
+             7. POP SCROLLER arrows for the Most Popular cards, plus
+                             the "open now / closed" line on Visit.
+
+           WHAT BREAKS IF YOU DELETE THE WHOLE SCRIPT:
+           Almost everything interactive. No page would ever get its
+           "active" class, so the main content area would stay blank;
+           the reviews, slideshow dots and map would never appear; the
+           mobile menu button would do nothing. The header, footer and
+           styling would still load, but the site would look empty.
+           Individual sections below say what breaks if you remove
+           just that part - most are safe to leave exactly as they are.
+           ================================================================ */
+
+        /* ================================================================
+           1. REVIEWS DATA
+           ------------------------------------------------------------
+           EDIT: REVIEWS - this list is the single source for every
+           review shown on the site. The same list feeds BOTH the
+           scrolling strip on the Home page AND the cards on the
+           Reviews page, so edit a quote once here and it updates in
+           both places.
+           Each review is one line:  { name: "Name", text: "Quote" }
+           - Keep the quotes, commas and curly braces exactly in that
+             shape; a missing comma between two reviews will stop the
+             whole script (and therefore the whole site) from working.
+           - To add a review: copy a line, paste it after the previous
+             one (with a comma after the line before it), change the
+             name and text.
+           - The odd codes like \u2019 inside the text are just a safe
+             way of writing an apostrophe (') and \u2026 is "...".
+             You can type normal apostrophes in new reviews instead;
+             just avoid typing a double-quote character inside the
+             text, because the text itself is wrapped in double quotes.
+           ================================================================ */
+        var REVIEWS = [
+          { name: "Jeff G.", text: "Some of the best Greek food I\u2019ve ever had and hands down the best hummus I\u2019ve ever tasted." },
+          { name: "Tosh G.", text: "What a fun little hole in the wall Greek place! The hummus and pitas were outstanding." },
+          { name: "Becca B.", text: "Everything is very fresh and tasty, consistently homemade." },
+          { name: "Erik G.", text: "We melted after eating the hummus\u2026 the baklava was fantastic." },
+          { name: "Darien B.", text: "The falafel is the best I\u2019ve had in Denver." },
+          { name: "Abbie B.", text: "10/10 I highly recommend!" }
+        ];
+        function stars() { return "\u2605\u2605\u2605\u2605\u2605"; }
+
+        /* HOW THE REVIEWS GET ONTO THE PAGE:
+           The HTML for the review strip and the Reviews grid is empty
+           on purpose. This code builds one small chunk of HTML per
+           review (stars, quote, name) and inserts it. stars() simply
+           returns five star characters. If this block were removed,
+           both review areas would stay empty - the rest of the site
+           would still work. The "if (track)" / "if (grid)" checks mean
+           "only do this if that element actually exists on the page",
+           a safety pattern used throughout this script. */
+        var track = document.getElementById("marqueeTrack");
+        if (track) {
+          var html = "";
+          REVIEWS.forEach(function (r) {
+            html += '<div class="rev-chip"><span class="stars" aria-label="5 star review">' + stars() + '</span><p>&ldquo;' + r.text + '&rdquo;</p><cite>— ' + r.name + '</cite></div>';
+          });
+          track.innerHTML = html + html; /* the review strip HTML is inserted TWICE, end to end. The CSS animation slides the strip left by exactly one copy's width and then loops, so the join is invisible. If you only insert it once, the strip will visibly jump and show empty space. */
+        }
+        var grid = document.getElementById("revGrid");
+        if (grid) {
+          grid.innerHTML = REVIEWS.map(function (r) {
+            return '<article class="rev-card"><span class="stars" aria-label="5 star review">' + stars() + '</span><p>&ldquo;' + r.text + '&rdquo;</p><cite>— ' + r.name + '</cite></article>';
+          }).join("");
+        }
+
+        /* ================================================================
+           2. PAGE ROUTING - the heart of the site. Read carefully.
+           ------------------------------------------------------------
+           PAGES lists the six page names. They must match the HTML:
+           for each name there is a <div class="page" id="page-NAME">
+           and nav links with href="#NAME" and data-nav="NAME".
+           showPage(name) does the switching:
+             - Any name it does not recognise becomes "home", so a
+               mistyped address can never produce a blank site.
+             - It walks all six pages and adds the class "active" to
+               the chosen one and removes it from the rest. CSS hides
+               every .page without .active, so exactly one page shows.
+             - It marks the matching nav link with aria-current="page"
+               (that is what lights up its gold symbol and tells screen
+               readers which page you are on) and clears the others.
+             - It updates the browser tab title for the page.
+             - It scrolls back to the top, and if the page is Visit it
+               kicks off the map (section 3).
+           WHAT BREAKS IF REMOVED: everything. Without showPage and
+           route() below, no page is ever activated and the content
+           area stays blank. If you rename a page, you must rename it
+           in PAGES, in its div id, and in every href/data-nav link.
+           ================================================================ */
+        var PAGES = ["home", "menu", "order", "reviews", "about", "visit"];
+        function showPage(name) {
+          /* Safety net: unknown page names fall back to the home page. */
+          if (PAGES.indexOf(name) === -1) name = "home";
+          PAGES.forEach(function (p) {
+            var el = document.getElementById("page-" + p);
+            if (el) el.classList.toggle("active", p === name);
+          });
+          document.querySelectorAll("nav.main a[data-nav]").forEach(function (a) {
+            if (a.getAttribute("data-nav") === name) a.setAttribute("aria-current", "page");
+            else a.removeAttribute("aria-current");
+          });
+          /* Update the browser tab / search title to match the page.
+             Home gets the long keyword-rich title; other pages get
+             "Menu | Cleopatra Grill & Hummus ..." style titles. */
+          document.title = (name === "home")
+            ? "Cleopatra Grill & Hummus | Egyptian & Mediterranean Restaurant in Federal Heights, CO"
+            : name.charAt(0).toUpperCase() + name.slice(1) + " | Cleopatra Grill & Hummus — Federal Heights, CO";
+          window.scrollTo(0, 0);
+          /* The map is only loaded when the Visit page is opened -
+             no point paying its loading cost on other pages. */
+          if (name === "visit") mountVisitMap();
+        }
+
+        /* ================================================================
+           3. VISIT MAP (interactive, with a picture fallback)
+           ------------------------------------------------------------
+           mountVisitMap() runs the first time the Visit page is shown
+           (the visitMapMounted flag makes sure it only ever runs once;
+           without that flag the map would be rebuilt on every visit).
+           It asks the map library (MapHelpers, from the external files
+           loaded above) to draw a map into the #visitMap box, centred
+           on the pin defined below.
+           EDIT: MAP PIN - the pin position is the lat / lng pair in
+           the places list below (latitude 39.8827669, longitude
+           -105.02409119, the restaurant's location). The label, venue
+           and address lines under it are the text shown with the pin.
+           FAILURE PLAN: if the library failed to load, or anything
+           throws an error, showMapFallback() hides the live map box
+           and reveals the static map picture instead, so the Visit
+           page never shows a blank hole. If the map ever looks blank
+           in a browser, this fallback is the first thing to check.
+           ================================================================ */
+        var visitMapMounted = false;
+        function showMapFallback() {
+          var live = document.getElementById("visitMap");
+          var fb = document.getElementById("mapFallback");
+          if (live) live.style.display = "none";
+          if (fb) fb.style.display = "block";
+        }
+        function mountVisitMap() {
+          if (visitMapMounted) return;
+          visitMapMounted = true;
+          var el = document.getElementById("visitMap");
+          if (!el || typeof MapHelpers === "undefined" || typeof HatchMaps === "undefined") {
+            showMapFallback();
+            return;
+          }
+          try {
+            /* "try" means: attempt the live map, and if anything goes
+               wrong, the catch block at the bottom quietly swaps in
+               the fallback picture instead of breaking the page. */
+            MapHelpers.mountMap(el, {
+              places: [{
+                label: "Cleopatra Grill & Hummus",
+                venue: "Cleopatra Grill & Hummus",
+                address: "10250 Federal Blvd, Unit 300",
+                locality: "Federal Heights",
+                region: "CO",
+                country: "US",
+                lat: 39.8827669,
+                lng: -105.02409119
+              }],
+              baseStyle: "light"
+            }, showMapFallback);
+          } catch (e) {
+            showMapFallback();
+          }
+        }
+        /* route() is the translator between the address bar and
+           showPage: it reads the hash (the part after # in the
+           address, e.g. "#menu"), strips the # sign, and hands the
+           word to showPage. With no hash at all it defaults to home.
+           The split("/")[0] ignores anything after a slash, just in
+           case a link ever arrives as "#menu/extra". */
+        function route() {
+          var h = (location.hash || "#home").replace("#", "");
+          showPage(h.split("/")[0]);
+        }
+        /* Two triggers keep routing in sync:
+           - "hashchange": whenever the hash changes (a nav click, a
+             footer link, the browser back button), route() runs.
+           - The click listener covers the awkward case of clicking
+             the link for the page you are ALREADY on: the hash does
+             not change, so no hashchange fires; setTimeout(route, 0)
+             simply re-runs route() a split-second later, which also
+             re-scrolls to the top and closes the mobile menu flow.
+           EVERY element with a data-nav attribute gets this listener -
+           that includes buttons inside pages, not just the header nav.
+           If these listeners were removed, the back button and
+           same-page clicks would stop switching pages correctly. */
+        document.querySelectorAll("[data-nav]").forEach(function (a) {
+          a.addEventListener("click", function () {
+            setTimeout(route, 0);
+          });
+        });
+        window.addEventListener("hashchange", route);
+
+        /* ================================================================
+           4. MOBILE NAV (the hamburger "Menu" button on phones)
+           ------------------------------------------------------------
+           On narrow screens the CSS hides the nav list; it only appears
+           when the <header> carries the class "nav-open". This code is
+           the switch:
+             - Tapping the button toggles nav-open on and off, and
+               updates aria-expanded / aria-label so screen readers
+               announce "Open menu" or "Close menu" correctly. The CSS
+               turns the three bars into an X while nav-open is on.
+             - closeMobileNav() removes the class and resets the
+               button. It is called when any nav link is tapped (so the
+               menu does not stay open over the new page), when the
+               Escape key is pressed, and if the window is widened past
+               phone size (so a rotated tablet never gets stuck with a
+               phone menu).
+           WHAT BREAKS IF REMOVED: on phones the Menu button would do
+           nothing and visitors could not reach any other page. On
+           desktop nothing would change - the button is hidden there.
+           ================================================================ */
+        var navToggle = document.getElementById("navToggle");
+        var siteHeader = document.querySelector("header.site");
+        /* Close helper: does nothing if the menu is already closed. */
+        function closeMobileNav() {
+          if (!siteHeader || !siteHeader.classList.contains("nav-open")) return;
+          siteHeader.classList.remove("nav-open");
+          if (navToggle) {
+            navToggle.setAttribute("aria-expanded", "false");
+            navToggle.setAttribute("aria-label", "Open menu");
+          }
+        }
+        if (navToggle && siteHeader) {
+          /* classList.toggle adds nav-open if it is absent and
+             removes it if present, and reports which state we landed
+             in (true = now open) so the button labels can match. */
+          navToggle.addEventListener("click", function () {
+            var open = siteHeader.classList.toggle("nav-open");
+            navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+            navToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+          });
+          document.querySelectorAll("nav.main a").forEach(function (a) {
+            a.addEventListener("click", closeMobileNav);
+          });
+          /* Escape key closes the menu (keyboard accessibility), and
+             growing the window beyond the 760px phone breakpoint
+             closes it too, so the desktop nav is never left hidden.
+             The 760 here must match the mobile media query width in
+             the CSS; change both together or neither. */
+          document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") closeMobileNav();
+          });
+          window.addEventListener("resize", function () {
+            if (window.innerWidth > 760) closeMobileNav();
+          });
+        }
+
+        /* ================================================================
+           5. MENU CATEGORY PILLS
+           ------------------------------------------------------------
+           Each pill (Appetizers, Sandwiches, ...) is a normal link to
+           an in-page anchor like #cat-salads, but a plain anchor would
+           confuse the router in section 2 (it would read "cat-salads"
+           as a page name). So this code intercepts the click:
+           e.preventDefault() stops the browser following the link and
+           changing the hash, then scrollIntoView smoothly scrolls the
+           matching menu section to the top of the screen instead.
+           WHAT BREAKS IF REMOVED: tapping a category pill would break
+           page routing and dump the visitor back on the Home page.
+           Do not remove the preventDefault line.
+           ================================================================ */
+        document.querySelectorAll("[data-cat]").forEach(function (a) {
+          a.addEventListener("click", function (e) {
+            e.preventDefault();
+            var t = document.getElementById(a.getAttribute("data-cat"));
+            if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+        });
+
+        /* Run route() once, right now, so the correct page appears on
+           first load (for example if someone opens a shared link that
+           ends in #menu, they land on the Menu page directly). */
+        route();
+
+        /* ================================================================
+           6. HERO PHOTO SLIDESHOW (Home page)
+           ------------------------------------------------------------
+           The photos themselves are ordinary HTML <figure class="slide">
+           elements in the hero (see EDIT: PHOTOS up there). This code:
+             - collects the slides into a list,
+             - creates one dot button per slide inside #slideDots
+               (the dots do not exist in the HTML - if this code is
+               removed, the dots vanish but the photos still work),
+             - go(i) shows slide number i by moving the "on" class,
+               wrapping around at both ends, and updates which dot is
+               marked current,
+             - restart() (re)starts the automatic timer,
+             - wires up the previous / next arrows and the dots,
+             - pauses auto-play while the mouse is over the slideshow.
+           "reduced" checks the visitor's prefers-reduced-motion
+           setting: if they asked their device for less animation, the
+           slideshow never auto-plays (they can still click through).
+           WHAT BREAKS IF REMOVED: the slideshow freezes on the first
+           photo and the arrows and dots stop working. The page still
+           loads fine - it just becomes a single static photo.
+           ================================================================ */
+        /* Working variables: "slides" = the list of photo elements;
+           "idx" = which photo is showing now (0 = the first one);
+           "timer" = the auto-play countdown handle, so it can be
+           stopped and restarted; "reduced" = the visitor's
+           reduced-motion preference described above. */
+        var slides = Array.prototype.slice.call(document.querySelectorAll("#slideshow .slide"));
+        var dotsBox = document.getElementById("slideDots");
+        var idx = 0, timer = null;
+        var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        /* Build one dot button per slide. Clicking a dot jumps
+           straight to that photo and restarts the auto-play timer,
+           so the visitor is not immediately whisked away. */
+        slides.forEach(function (_, i) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.setAttribute("aria-label", "Show photo " + (i + 1));
+          if (i === 0) b.setAttribute("aria-current", "true");
+          b.addEventListener("click", function () { go(i); restart(); });
+          dotsBox.appendChild(b);
+        });
+        var dots = Array.prototype.slice.call(dotsBox.children);
+        function go(i) {
+          /* The % (modulo) arithmetic is the wrap-around trick:
+             asking for one past the last slide lands back on the
+             first, and one before the first lands on the last. */
+          idx = (i + slides.length) % slides.length;
+          slides.forEach(function (s, j) { s.classList.toggle("on", j === idx); });
+          dots.forEach(function (d, j) {
+            if (j === idx) d.setAttribute("aria-current", "true");
+            else d.removeAttribute("aria-current");
+          });
+        }
+        /* restart() clears any existing countdown, then starts a
+           fresh one - unless the visitor prefers reduced motion or
+           there is only one photo.
+           EDIT: SLIDESHOW SPEED - 4500 is the delay in milliseconds
+           between photos (4500 = 4.5 seconds). Raise it for a calmer
+           slideshow, lower it for a faster one. */
+        function restart() {
+          if (timer) clearInterval(timer);
+          if (!reduced && slides.length > 1) {
+            timer = setInterval(function () { go(idx + 1); }, 4500);
+          }
+        }
+        /* Arrow buttons: step one photo back or forward, then restart
+           the timer so auto-play continues from the new photo.
+           Hovering pauses auto-play (clearInterval stops the
+           countdown); moving the mouse away restarts it. The final
+           restart() call starts auto-play as soon as the page loads. */
+        document.getElementById("slidePrev").addEventListener("click", function () { go(idx - 1); restart(); });
+        document.getElementById("slideNext").addEventListener("click", function () { go(idx + 1); restart(); });
+        var show = document.getElementById("slideshow");
+        show.addEventListener("mouseenter", function () { if (timer) clearInterval(timer); });
+        show.addEventListener("mouseleave", restart);
+        restart();
+
+        /* ================================================================
+           7. MOST POPULAR SCROLLER (Home page cards)
+           ------------------------------------------------------------
+           The five dish cards sit in a sideways-scrolling row. Visitors
+           can swipe or scroll it directly; this code powers the two
+           round arrow buttons and keeps them honest:
+             - popStep() measures one card's width (plus the gap), so
+               each arrow click scrolls by exactly one card.
+             - syncPopArrows() disables the back arrow at the start of
+               the row and the forward arrow at the end, so nobody
+               clicks an arrow that can go nowhere. It re-checks after
+               every scroll and every window resize.
+           WHAT BREAKS IF REMOVED: the row still scrolls by touch,
+           mouse wheel or keyboard, but the arrow buttons stop working
+           and would never grey out. Harmless but noticeably worse.
+           ================================================================ */
+        var popScroller = document.getElementById("popScroller");
+        var popPrev = document.getElementById("popPrev");
+        var popNext = document.getElementById("popNext");
+        if (popScroller && popPrev && popNext) {
+          function popStep() {
+            /* 17.6 is the pixel gap between cards; 280 is a fallback
+               width used only if no card can be measured. */
+            var card = popScroller.querySelector(".pop-card");
+            return card ? card.getBoundingClientRect().width + 17.6 : 280;
+          }
+          function syncPopArrows() {
+            var max = popScroller.scrollWidth - popScroller.clientWidth - 4;
+            popPrev.disabled = popScroller.scrollLeft <= 4;
+            popNext.disabled = popScroller.scrollLeft >= max;
+          }
+          popPrev.addEventListener("click", function () {
+            popScroller.scrollBy({ left: -popStep(), behavior: reduced ? "auto" : "smooth" });
+          });
+          popNext.addEventListener("click", function () {
+            popScroller.scrollBy({ left: popStep(), behavior: reduced ? "auto" : "smooth" });
+          });
+          popScroller.addEventListener("scroll", syncPopArrows, { passive: true });
+          window.addEventListener("resize", syncPopArrows);
+          syncPopArrows();
+        }
+
+        /* ================================================================
+           8. VISIT PAGE: TODAY'S HIGHLIGHT + "OPEN NOW" MESSAGE
+           ------------------------------------------------------------
+           Two small touches that run once when the page loads:
+             - It works out today's day of the week from the visitor's
+               own clock. getDay() numbers days 0 to 6 starting with
+               Sunday, which is exactly how the hours table rows are
+               labelled with data-day in the HTML. The matching row
+               gets the class "today", and the CSS paints it red.
+             - It converts the current time into minutes since
+               midnight and compares it with opening and closing (see
+               the EDIT note inside) to choose one of three messages
+               for the #openStatus line under the hours table:
+               open now, opens later today, or closed until tomorrow.
+           WHAT BREAKS IF REMOVED: nothing structural - the hours table
+           would simply stop highlighting today and the line under it
+           would keep its default text. Safe, but a nice detail to keep.
+           ================================================================ */
+        var now = new Date();
+        var row = document.querySelector('#hoursTable tr[data-day="' + now.getDay() + '"]');
+        if (row) row.classList.add("today");
+        var status = document.getElementById("openStatus");
+        /* EDIT: HOURS - the maths below works in minutes since
+           midnight: 11 * 60 means 11:00 AM (opening) and 21 * 60 means
+           9:00 PM (closing, 21:00 in 24-hour time). If the restaurant
+           changes its hours, change these two numbers here AND the
+           visible hours in the top bar, Visit table, footer and the
+           JSON-LD block in the <head>. */
+        if (status) {
+          var mins = now.getHours() * 60 + now.getMinutes();
+          if (mins >= 11 * 60 && mins < 21 * 60) {
+            status.textContent = "We\u2019re open right now — until 9:00 PM tonight. Dine in, call for takeout, or order delivery.";
+          } else if (mins < 11 * 60) {
+            status.textContent = "We open today at 11:00 AM. Call ahead and we\u2019ll have it ready.";
+          } else {
+            status.textContent = "We\u2019re closed for tonight — we reopen tomorrow at 11:00 AM.";
+          }
+        }
+      })();
+      /* End of the site's own script - this closing line matches the
+         (function () { wrapper at the top. Both must stay. */
+    </script>
+  </body>
+</html>
